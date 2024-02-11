@@ -1,0 +1,56 @@
+---
+title: "HW2"
+author: Son Luu (id), Xihan Qian (id) and Javier Mtz.-Rdz. (94785938)
+pdf-engine: pdflatex
+format: 
+  pdf:
+    documentclass: report
+    header-includes: |
+      \usepackage[left=0.8in,right=0.8in,top=0.7in,footskip=1.5pt]{geometry} 
+      % \usepackage{changepage}
+      \usepackage{amsmath,amsthm,amssymb,amsfonts}
+      \usepackage{mathtools}
+      % enumitem for custom lists
+      \usepackage{enumitem}
+      % Load dsfont this to get proper indicator function (bold 1) with      \mathds{1}:
+      \usepackage{dsfont}
+      \usepackage{centernot}
+      \usepackage[usenames,dvipsnames,table]{xcolor}
+    fontsize: 12pt
+    colorlinks: true
+---
+
+## Introduction
+
+Quarto enables you to weave together content and executable code into a finished document. To learn more about Quarto see <https://quarto.org>.
+
+## Data Description and Summaries
+
+When you click the **Render** button a document will be generated that includes both content and the output of embedded code. You can embed code like this:
+
+```{r}
+1 + 1
+```
+
+You can add options to executable code like this
+
+```{r}
+#| echo: false
+2 * 2
+```
+
+The `echo: false` option disables the printing of code (only output is displayed).
+
+## Exploratory Analysis
+
+When you click the **Render** button a document will be generated that includes both content and the output of embedded code. You can embed code like this:
+
+
+
+## Formal analysis
+
+
+## Conclusion
+
+
+
