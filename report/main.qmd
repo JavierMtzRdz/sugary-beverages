@@ -1,5 +1,5 @@
 ---
-title: "**STAT550 Homework No 2: Advise for the case “...”**"
+title: "**STAT550 Homework No 2: Advise for Evaluating Interventions on Sugary and Zero-Calorie Beverage Consumption”**"
 author: Son Luu (id), Xihan Qian (id) and Javier Mtz.-Rdz. (94785938)
 pdf-engine: pdflatex
 date: "March 1, 2024"
@@ -17,6 +17,9 @@ format:
       \usepackage{dsfont}
       \usepackage{centernot}
       \usepackage[usenames,dvipsnames,table]{xcolor}
+      \usepackage{booktabs} % For improved table lines
+      \renewcommand{\arraystretch}{1.3} % Increase row spacing
+      \renewcommand\thefigure{\arabic{figure}}
     fontsize: 12pt
     colorlinks: true
 ---
@@ -27,28 +30,36 @@ Quarto enables you to weave together content and executable code into a finished
 
 ## Data Description and Summaries
 
-When you click the **Render** button a document will be generated that includes both content and the output of embedded code. You can embed code like this:
+To determine the impact of different interventions on the consumption of sugary and zero-calorie beverages, the study collected data on the beverages sold at four cafeterias and three convenience shops across three sites. Daily sales of these beverages were recorded over a period of 221 days, from October 27 to May 23. The resulting dataset includes variables related to … 
 
-```{r}
-1 + 1
-print("hello world")
-```
+As a summary, Table \ref{tab:observations} shows  the variables available in the dataset, their classification and how they are measured.
 
-You can add options to executable code like this
-
-```{r}
-#| echo: false
-2 * 2
-print("hello world")
-```
-
-The `echo: false` option disables the printing of code (only output is displayed).
+\begin{table}[htbp]
+\centering
+\caption{\textbf{Description of Observations}}
+\label{tab:observations}
+\begin{tabular}{p{6cm} c p{6cm}}
+\toprule
+\textbf{Variable} & \textbf{Type} & \textbf{Unit}   \\
+\midrule
+Day of the quasi-experiment & Continuous & - \\
+Day of the week & Continuous & - \\
+Site & Categorical & - \\
+Intervention & Categorical & - \\
+Sugary beverages sold & Continuous & Standardized units \\
+Zero-calorie beverages sold & Continuous & - \\
+Other beverages sold & Continuous & - \\
+\bottomrule
+\end{tabular}
+\end{table}
 
 ## Exploratory Analysis
 
-Start 
+To start understanding the behavior of the data in this study, 
 
-![Sale of sugary and zero-calorie drinks by intervention](../figs/eda_1.png){width="700"} 
+![**Sale of sugary and zero-calorie drinks by intervention**](../figs/eda-1_time-serie.png){width="700"} 
+
+Based on the plot provided, we can observe some important characteristics of the data. Firstly, the measurements for each site began at different times. For example, the first site has 21 pre-intervention observations, whereas the last site only has two. Secondly, the third site experienced a significant increase in sales during most of the first intervention, but afterwards, sales remained at a lower and more stable level. Thirdly, the order of the three calorie messaging interventions was different for each site. Lastly, it is evident from the data that there is a weekly seasonal effect.
 
 
 
@@ -65,3 +76,9 @@ Notes:
 ## Formal analysis
 
 ## Conclusion
+
+## Appendices
+\renewcommand\thefigure{A.\arabic{figure}}
+\setcounter{figure}{0}
+
+![**Sale of sugary and zero-calorie drinks by week and site**](../figs/eda-2_season-plot.png){width="700"} 
