@@ -1,18 +1,19 @@
 ---
-title: "HW2"
+title: "**STAT550 Homework No 2: Advise for the case “...”**"
 author: Son Luu (id), Xihan Qian (id) and Javier Mtz.-Rdz. (94785938)
 pdf-engine: pdflatex
+date: "March 1, 2024"
+date-format: long
 format: 
   pdf:
     documentclass: report
     header-includes: |
       \usepackage[left=0.8in,right=0.8in,top=0.7in,footskip=1.5pt]{geometry} 
-      % \usepackage{changepage}
       \usepackage{amsmath,amsthm,amssymb,amsfonts}
       \usepackage{mathtools}
       % enumitem for custom lists
       \usepackage{enumitem}
-      % Load dsfont this to get proper indicator function (bold 1) with      \mathds{1}:
+      % Load dsfont this to get proper indicator function (bold 1) with        \mathds{1}:
       \usepackage{dsfont}
       \usepackage{centernot}
       \usepackage[usenames,dvipsnames,table]{xcolor}
@@ -30,6 +31,7 @@ When you click the **Render** button a document will be generated that includes 
 
 ```{r}
 1 + 1
+print("hello world")
 ```
 
 You can add options to executable code like this
@@ -37,20 +39,29 @@ You can add options to executable code like this
 ```{r}
 #| echo: false
 2 * 2
+print("hello world")
 ```
 
 The `echo: false` option disables the printing of code (only output is displayed).
 
 ## Exploratory Analysis
 
-When you click the **Render** button a document will be generated that includes both content and the output of embedded code. You can embed code like this:
+Start 
+
+![Sale of sugary and zero-calorie drinks by intervention](../figs/eda_1.png){width="700"} 
 
 
+
+Notes:
+
+-   Different start
+
+-   Questions regarding db.
+
+-   Intervention order.
+
+-   Non-integers in some totals.
 
 ## Formal analysis
 
-
 ## Conclusion
-
-
-
