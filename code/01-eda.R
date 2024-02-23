@@ -357,7 +357,7 @@ sug_bev_acf %>%
   geom_point(size = 0.4) +
   geom_ribbon(aes(ymin = -ic_alpha, ymax=ic_alpha,
                   x = ifelse(lag > 10, lag + 1, lag - 1),
-                  fill = "Limit of significance \n(5% significance limit)"),
+                  fill = "Limit of significance (5%)"),
               alpha = 0.2,
               linetype = "dashed",
               color = "#FF483B") +

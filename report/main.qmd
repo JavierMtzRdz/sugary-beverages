@@ -1,5 +1,5 @@
 ---
-title: "**STAT550 Homework No 2: Advise for Evaluating Interventions on Sugary and Zero-Calorie Beverage Consumption”**"
+title: "**STAT550 Homework No 2: Advise for Evaluating Interventions on Sugary and Zero-Calorie Beverage Consumption**"
 author: Son Luu (id), Xihan Qian (id) and Javier Mtz.-Rdz. (94785938)
 pdf-engine: pdflatex
 date: "March 1, 2024"
