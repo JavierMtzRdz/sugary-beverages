@@ -17,9 +17,14 @@
 
 # Setup ----
 ## Packages to use ----
+
+#' To install mytidyfunctions, you need 
+#' remotes::install_github("JavierMtzRdz/mytidyfunctions")
+
 pacman::p_load(tidyverse, janitor, writexl, 
                readxl, scales, mytidyfunctions,
-               tsibble)
+               tsibble, feasts, forecast,
+               patchwork)
 
 ## Specify locale ----
 Sys.setlocale("LC_ALL", "es_ES.UTF-8")
@@ -62,8 +67,8 @@ sug_bev_long <- sug_bev %>%
                                "wash2" = "Washout",
                                "preint" = "Pre-intervention",
                                "follow" = "Follow", # Confirm categories
-                               "dismes" = "Discount", # Assuming that 10% price discount was first.
-                               "dis" = "Discount +\nmessaging",
+                               "dis" = "Discount", # Assuming that 10% price discount was first.
+                               "dismes" = "Discount +\nmessaging",
                                "cal" = "Caloric content \nmessaging",
                                "excer" = "Exercise equivalents \nmessaging",
                                "both" = "Both \nmessages"))
@@ -97,7 +102,7 @@ sug_bev_long %>%
     title.position = "top")) +
   labs(colour = "Beverage",
        fill = "Intervention periods",
-       x = "Days",
+       x = "Days since the start of the study",
        y = "Sold beverages",
        caption = "Source: client submission. ") +
   theme_jmr(legend.spacing = unit(0.5, "cm"),
@@ -121,8 +126,9 @@ sug_bev_long %>%
   facet_wrap(~site,
              scales = "free_y",
              ncol = 1) +
-  geom_line() +
-  scale_x_continuous(expand = expansion(mult = c(0.02, 0.02))) +
+  geom_line(size = 0.5) +
+  scale_x_continuous(breaks = 1:7,
+                     expand = expansion(mult = c(0.02, 0.02))) +
   scale_color_jmr(guide = guide_legend(
     nrow = 1,
     direction = "horizontal",
@@ -146,21 +152,81 @@ ggsave("figs/eda-2_season-plot.png",
 
 
 # Time-series analysis ----
-## Set time-series tibble
+## Set time-series tibble -----
 
 sug_bev_ts <- sug_bev %>% 
-  filter(site == "HF",
-         !is.na(zero_cal)) %>% 
-  as_tsibble(index = count)
+  # filter(!is.na(zero_cal)) %>% 
+  as_tsibble(index = count,
+             key = c(site)) %>% 
+  tsibble::fill_gaps() %>% 
+  select(site, count, zero_cal, sugary) %>% 
+  zoo::na.locf()
 
-pacman::p_load(feasts, forecast)
+## Decomposed dataset -----
+sug_bev_decompos <- sug_bev_ts %>% 
+  split(.$site) %>%
+  map(~ model(., stl = classical_decomposition(zero_cal ~ season(7)))) %>%
+  map_df(components) %>% 
+  transmute(site, count, 
+            original = zero_cal, 
+            beverage = "Zero-calorie",
+            trend, seasonal, 
+            random, season_adjust) %>% 
+  as_tibble() %>% 
+  bind_rows(sug_bev_ts %>% 
+              split(.$site) %>%
+              map(~ model(., stl = classical_decomposition(sugary ~ season(7)))) %>%
+              map_df(components) %>% 
+              transmute(site, count, 
+                        original = sugary, 
+                        beverage = "Sugary",
+                        trend, seasonal, 
+                        random, season_adjust)) %>% 
+  left_join(sug_bev %>% 
+              select(count, site, intervention), 
+            by = join_by(count, site))
 
-(hf <- sug_bev_ts %>% 
-  filter(site == "HF") %>% 
-  model(stl = classical_decomposition(zero_cal ~ season(7))) %>%
-  components() %>% 
-  autoplot() +
-  theme_jmr())
+### Save decomposed dataset -----
+# sug_bev_decompos %>% 
+#   write_csv("gendata/sug_bev_decompos.csv")
+### Save decomposed dataset -----
+sug_bev_decompos <- read_csv("gendata/sug_bev_decompos.csv")
+
+### Plot decomposition ----
+sug_bev_decompos %>% 
+  select(-season_adjust, -intervention) %>% 
+  pivot_longer(c(original, trend,
+                 seasonal, random)) %>% 
+  mutate(name = str_to_sentence(name)) %>% 
+  ggplot(aes(x = count, 
+             y = value,
+             color = beverage)) +
+  ggh4x::facet_grid2(vars(fct_inorder(name)), vars(site),
+                     scales = "free",
+                     independent = "y") +
+  geom_line(size = 0.3) +
+  scale_x_continuous(expand = expansion(mult = c(0.02, 0.02))) +
+  scale_color_jmr(guide = guide_legend(
+    nrow = 1,
+    direction = "horizontal",
+    title.position = "left")) +
+  labs(colour = "Beverage",
+       fill = "Intervention periods",
+       x = "Days since the start of the study",
+       y = "Sold beverages",
+       caption = "Source: client submission. ") +
+  theme_jmr(legend.spacing = unit(0.5, "cm"),
+            legend.key.height = unit(0.7, "cm"),
+            text = element_text(family = "Times New Roman"))
+  
+
+
+ggsave("figs/eda-3_decomposition.png",
+       bg = "transparent",
+       width = 200,                 # Ancho de la gráfica
+       height = 120,
+       units = "mm",
+       dpi = 300)
 
 # TODO: Create database just with the trends 
 # - ACF
