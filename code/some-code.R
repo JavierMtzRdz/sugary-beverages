@@ -54,19 +54,19 @@ sug_bev_long <- sug_bev %>%
   pivot_longer(zero_cal:sugary,
                names_to = "beverage",
                values_to = "values") %>% 
-  mutate(beverage = recode(beverage, 
+  mutate(beverage = recode(beverage,
                            "zero_cal" = "Zero-calorie",
                            "sugary" = "Sugary"),
-         intervention = recode(intervention, 
-                               "wash" = "None",
-                               "wash2" = "None",
-                               "preint" = "None",
+         intervention = recode(intervention,
+                               "wash" = "Washout",
+                               "wash2" = "Washout",
+                               "preint" = "Pre-intervention",
                                "follow" = "Follow", # Confirm categories
                                "dismes" = "Discount", # Assuming that 10% price discount was first.
                                "dis" = "Discount +\nmessaging",
                                "cal" = "Caloric content \nmessaging",
                                "excer" = "Exercise equivalents \nmessaging",
-                               "both" = "Both \nmessages")) 
+                               "both" = "Both \nmessages"))
 
 # Plots -----
 
@@ -162,5 +162,6 @@ pacman::p_load(feasts, forecast)
   autoplot() +
   theme_jmr())
 
-
-
+# TODO: Create database just with the trends 
+# - ACF
+# - PCF

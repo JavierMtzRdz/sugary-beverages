@@ -26,6 +26,7 @@ format:
 
 ## Introduction
 
+
 Quarto enables you to weave together content and executable code into a finished document. To learn more about Quarto see <https://quarto.org>.
 
 ## Data Description and Summaries
@@ -33,6 +34,9 @@ Quarto enables you to weave together content and executable code into a finished
 To determine the impact of different interventions on the consumption of sugary and zero-calorie beverages, the study collected data on the beverages sold at four cafeterias and three convenience shops across three sites. Daily sales of these beverages were recorded over a period of 221 days, from October 27 to May 23. The resulting dataset includes variables related to … 
 
 As a summary, Table \ref{tab:observations} shows  the variables available in the dataset, their classification and how they are measured.
+
+Missing data is CAR.
+
 
 \begin{table}[htbp]
 \centering
