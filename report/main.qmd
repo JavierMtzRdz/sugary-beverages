@@ -66,17 +66,6 @@ To start understanding the behavior of the data in this study,
 Based on the plot provided, we can observe some important characteristics of the data. Firstly, the measurements for each site began at different times. For example, the first site has 21 pre-intervention observations, whereas the last site only has two. Secondly, the third site experienced a significant increase in sales during most of the first intervention, but afterwards, sales remained at a lower and more stable level. Thirdly, the order of the three calorie messaging interventions was different for each site. Lastly, it is evident from the data that there is a weekly seasonal effect.
 
 
-
-Notes:
-
--   Different start
-
--   Questions regarding db.
-
--   Intervention order.
-
--   Non-integers in some totals.
-
 ## Formal analysis
 
 ## Conclusion
@@ -86,3 +75,8 @@ Notes:
 \setcounter{figure}{0}
 
 ![**Sale of sugary and zero-calorie drinks by week and site**](../figs/eda-2_season-plot.png){width="700"} 
+
+![**Time-Series Decomposition of sugary and zero-calorie beverage sales**](../figs/eda-3_decomposition.png){width="700"} 
+
+
+
