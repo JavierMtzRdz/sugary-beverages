@@ -76,7 +76,8 @@ Based on the plot provided, we can observe some important characteristics of the
 
 ![**Sale of sugary and zero-calorie drinks by week and site**](../figs/eda-2_season-plot.png){width="700"} 
 
-![**Time-Series Decomposition of sugary and zero-calorie beverage sales**](../figs/eda-3_decomposition.png){width="700"} 
+![**Decomposition Analysis of Sales for Sugary and Zero-Calorie Beverages**](../figs/eda-3_decomposition.png){width="700"} 
 
+![**ACF and PACF by Beverage and Site**](../figs/eda-4_acf-pacf.png){width="700"} 
 
 

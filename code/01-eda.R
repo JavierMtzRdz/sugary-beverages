@@ -213,8 +213,7 @@ sug_bev_decompos %>%
   labs(colour = "Beverage",
        fill = "Intervention periods",
        x = "Days since the start of the study",
-       y = "Sold beverages",
-       caption = "Source: client submission. ") +
+       y = "Sold beverages") +
   theme_jmr(legend.spacing = unit(0.5, "cm"),
             legend.key.height = unit(0.7, "cm"),
             text = element_text(family = "Times New Roman"))
@@ -228,6 +227,158 @@ ggsave("figs/eda-3_decomposition.png",
        units = "mm",
        dpi = 300)
 
-# TODO: Create database just with the trends 
-# - ACF
-# - PCF
+# Autocorrelation analysis ------
+# First try
+sug_bev_ts %>% 
+  filter(site == "NS") %>% 
+  pull(sugary) %>% 
+  acf() 
+
+sug_bev_ts %>% 
+  filter(site == "NS") %>% 
+  pull(zero_cal) %>% 
+  acf() 
+
+sug_bev_ts %>% 
+  filter(site == "NS") %>% 
+  pull(zero_cal) %>% 
+  pacf() 
+
+sug_bev_ts %>% 
+  filter(site == "NS") %>% 
+  pull(zero_cal) %>% 
+  acf(plot= F) %>% 
+  with(data.frame(lag, acf, n.used)) %>% 
+  mutate(ic_alpha = qnorm((1 + (1 - 0.05))/2)/sqrt(n.used)) %>% 
+  ggplot(mapping = aes(x = lag, y = acf)) +
+  geom_hline(aes(yintercept = 0)) +
+  geom_segment(mapping = aes(xend = lag, yend = 0))+
+  geom_hline(aes(yintercept = ic_alpha), linetype = 2, color = 'darkblue') + 
+  geom_hline(aes(yintercept = -ic_alpha), linetype = 2, color = 'darkblue')
+
+
+## Autocorrelation Function (ACF) and Partial Autocorrelation Function (PACF)------
+### Estimate ACF and PAC
+
+sug_bev_acf <- sug_bev_ts %>% 
+  split(.$site) %>%
+  map(~ pull(., zero_cal)) %>%
+  map(~ acf(., plot= F)) %>%
+  map(~ with(., data.frame(lag, acf, n.used))) %>% 
+  map2_df(unique(sug_bev_ts$site), 
+          function (.x, .y) {mutate(.x,
+                                    site = .y,
+                                    beverage = "Zero-calorie",
+                                    test = "ACF",
+                                    ic_alpha = qnorm((1 + (1 - 0.05))/2)/
+                                      sqrt(n.used))}) %>% 
+  bind_rows(sug_bev_ts %>% 
+              split(.$site) %>%
+              map(~ pull(., zero_cal)) %>%
+              map(~ pacf(., plot= F)) %>%
+              map(~ with(., data.frame(lag, acf, n.used))) %>% 
+              map2_df(unique(sug_bev_ts$site), 
+                      function (.x, .y) {mutate(.x,
+                                                site = .y,
+                                                beverage = "Zero-calorie",
+                                                test = "PACF",
+                                                ic_alpha = qnorm((1 + (1 - 0.05))/2)/
+                                                  sqrt(n.used))}),
+            sug_bev_ts %>% 
+              split(.$site) %>%
+              map(~ pull(., sugary)) %>%
+              map(~ acf(., plot= F)) %>%
+              map(~ with(., data.frame(lag, acf, n.used))) %>% 
+              map2_df(unique(sug_bev_ts$site), 
+                      function (.x, .y) {mutate(.x,
+                                                site = .y,
+                                                beverage = "Sugary",
+                                                test = "ACF",
+                                                ic_alpha = qnorm((1 + (1 - 0.05))/2)/
+                                                  sqrt(n.used))}),
+            sug_bev_ts %>% 
+              split(.$site) %>%
+              map(~ pull(., sugary)) %>%
+              map(~ pacf(., plot= F)) %>%
+              map(~ with(., data.frame(lag, acf, n.used))) %>% 
+              map2_df(unique(sug_bev_ts$site), 
+                      function (.x, .y) {mutate(.x,
+                                                site = .y,
+                                                beverage = "Sugary",
+                                                test = "PACF",
+                                                ic_alpha = qnorm((1 + (1 - 0.05))/2)/
+                                                  sqrt(n.used))})) 
+
+### Plot ACF
+sug_bev_acf %>% 
+  filter(test == "ACF") %>% 
+  mutate(lag = ifelse(beverage == "Sugary", 
+                      lag - 0.05, lag + 0.1)) %>% 
+  ggplot(aes(x = lag, y = acf)) +
+  facet_wrap(~site,
+             scales = "free",
+             ncol = 1) +
+  geom_hline(aes(yintercept = 0)) +
+  geom_segment(aes(xend = lag,
+                   yend = 0,
+                   color = beverage)) +
+  geom_hline(aes(yintercept = ic_alpha,
+                 linetype = "Limit of significance"), 
+             color = 'darkblue') + 
+  geom_hline(aes(yintercept = -ic_alpha,
+                 linetype = "Limit of significance"), 
+             color = 'darkblue') +
+  scale_linetype_manual(values = "dashed") +
+  scale_color_jmr(guide = guide_legend(
+    nrow = 1,
+    direction = "horizontal",
+    title.position = "left")) +
+  labs(colour = "Beverage",
+       fill = "Intervention periods",
+       x = "Lags",
+       y = "Autocorrelation Function (ACF)",
+       linetype = element_blank()) +
+  theme_jmr(legend.spacing = unit(0.5, "cm"),
+            legend.key.height = unit(0.7, "cm"),
+            text = element_text(family = "Times New Roman"))
+
+## Combined plot ------
+sug_bev_acf %>% 
+  mutate(lag = ifelse(beverage == "Sugary", 
+                      lag - 0.12, lag + 0.12)) %>% 
+  ggplot(aes(x = lag, y = acf,
+             color = beverage)) +
+  ggh4x::facet_grid2(vars(test), vars(site),
+                     switch = "y",
+                     scales = "free") +
+  geom_hline(aes(yintercept = 0)) +
+  geom_segment(aes(xend = lag,
+                   yend = 0)) +
+  geom_point(size = 0.4) +
+  geom_ribbon(aes(ymin = -ic_alpha, ymax=ic_alpha,
+                  x = ifelse(lag > 10, lag + 1, lag - 1),
+                  fill = "Limit of significance \n(5% significance limit)"),
+              alpha = 0.2,
+              linetype = "dashed",
+              color = "#FF483B") +
+  scale_linetype_manual(values = "dashed") +
+  scale_x_continuous(expand = expansion(mult = c(0.0, 0.0))) +
+  scale_color_jmr(guide = guide_legend(
+    nrow = 1,
+    direction = "horizontal",
+    title.position = "left")) +
+  labs(colour = "Beverage",
+       fill = element_blank(),
+       x = "Lags",
+       y = element_blank(),
+       linetype = element_blank()) +
+  theme_jmr(legend.spacing = unit(0.5, "cm"),
+            legend.key.height = unit(0.7, "cm"),
+            text = element_text(family = "Times New Roman"))
+
+ggsave("figs/eda-4_acf-pacf.png",
+       bg = "transparent",
+       width = 200,                 # Ancho de la gráfica
+       height = 120,
+       units = "mm",
+       dpi = 300)
