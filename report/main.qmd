@@ -1,6 +1,6 @@
 ---
 title: "HW2"
-author: Son Luu (id), Xihan Qian (id) and Javier Mtz.-Rdz. (94785938)
+author: Son Luu (id), Xihan Qian (54285556) and Javier Mtz.-Rdz. (94785938)
 pdf-engine: pdflatex
 format: 
   pdf:
@@ -49,6 +49,9 @@ When you click the **Render** button a document will be generated that includes 
 
 ## Formal analysis
 
+#### Difference-in-Difference Estimation
+
+DID, or Difference-in-Differences, is a quasi-experimental method that utilizes longitudinal data from treatment and control groups. This approach is particularly effective in this design, as it aligns with the quasi-experimental nature of the study. This method aims to create a suitable counterfactual for estimating causal effects by comparing changes over time between the groups. The key assumption behind DID is that in the absence of the treatment, the average change in the outcome for the treatment group would have been the same as the average change for the control group.
 
 ## Conclusion
 
