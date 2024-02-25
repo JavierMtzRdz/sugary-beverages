@@ -24,7 +24,7 @@
 pacman::p_load(tidyverse, janitor, writexl, 
                readxl, scales, mytidyfunctions,
                tsibble, feasts, forecast,
-               patchwork)
+               cowplot, GGally)
 
 ## Specify locale ----
 Sys.setlocale("LC_ALL", "es_ES.UTF-8")
@@ -44,6 +44,8 @@ sug_bev <- read_csv("rawdata/june1data.csv") %>%
          date = as_date(count, # It does not match the dates very well.
                         origin = "00-10-25 UTC")) %>% 
   arrange(site, count)
+
+glimpse(sug_bev)
 # General estimations ----
 ## Total count 
 sug_bev %>% 
@@ -377,6 +379,59 @@ sug_bev_acf %>%
             text = element_text(family = "Times New Roman"))
 
 ggsave("figs/eda-4_acf-pacf.png",
+       bg = "transparent",
+       width = 200,                 # Ancho de la gráfica
+       height = 120,
+       units = "mm",
+       dpi = 300)
+
+# Scatter plots and correlations ------
+
+## Internal plot functions
+my_scatter <- function(data, mapping, ...){
+  ggplot(data = data, mapping = mapping) + 
+    geom_point(alpha = 0.2) + 
+    geom_smooth(method=lm, 
+                alpha = 0.2,
+                ...) 
+}
+
+my_dens <- function(data, mapping, ...) {
+  ggplot(data = data, mapping=mapping) +
+    geom_density(...) 
+}
+
+## Generate plot 
+
+cor_site <- ggpairs(sug_bev, columns = c(2, 5:6), 
+                    aes(colour = site),
+                    upper = list(continuous = wrap("cor", size = 3,
+                                                   family = "Times New Roman")),
+                    lower = list(continuous = my_scatter),
+                    diag = list(continuous = my_dens)) +
+  scale_color_jmr() +
+  scale_fill_jmr() +
+  labs(subtitle = "By site") +
+  theme_jmr(text = element_text(family = "Times New Roman"))
+
+cor_inte <- ggpairs(sug_bev, columns = c(2, 5:6), 
+                    aes(colour = intervention),
+                    upper = list(continuous = wrap("cor", size = 2.5,
+                                                   family = "Times New Roman")),
+                    lower = list(continuous = my_scatter),
+                    diag = list(continuous = my_dens)) +
+  scale_color_jmr() +
+  scale_fill_jmr() +
+  labs(subtitle = "By intervention") +
+  theme_jmr(text = element_text(family = "Times New Roman"))
+
+plot_grid(
+  ggmatrix_gtable(cor_site),
+  ggmatrix_gtable(cor_inte),
+  nrow = 1
+)
+
+ggsave("figs/eda-5_corr.png",
        bg = "transparent",
        width = 200,                 # Ancho de la gráfica
        height = 120,
