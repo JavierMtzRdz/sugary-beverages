@@ -1,6 +1,6 @@
 ---
-title: "**STAT550 Homework No 2: Advise for Evaluating Interventions on Sugary and Zero-Calorie Beverage Consumption**"
-author: Son Luu (id), Xihan Qian (id) and Javier Mtz.-Rdz. (94785938)
+title: "HW2"
+author: Son Luu (id), Xihan Qian (54285556) and Javier Mtz.-Rdz. (94785938)
 pdf-engine: pdflatex
 date: "March 1, 2024"
 date-format: long
@@ -29,6 +29,7 @@ format:
       \renewcommand\thefigure{\arabic{figure}}
     fontsize: 12pt
     colorlinks: true
+bibliography: ../reference/ref.bib
 ---
 
 ```{=tex}
@@ -72,9 +73,19 @@ In particular, @fig-1 shows some important characteristics of the dataset. First
 
 # Formal analysis
 
+## Difference-in-Difference Estimation
+
+DID, or Difference-in-Differences, is a quasi-experimental method that utilizes longitudinal data from intervention and control groups [@angrist_mostly_2008]. This approach is particularly effective in this design, as it aligns with the quasi-experimental nature of the study. This method aims to create a suitable counterfactual for estimating causal effects by comparing changes over time between the groups. The key assumption behind DID is that in the absence of the intervention, the average change in the outcome for the intervention group would have been the same as the average change for the control group. 
+
+Before applying the model, there are a few assumptions to be checked. Most importantly, there need to be parallel trends between the intervention and the control group. Moreover, at the baseline, the allocation of the intervention should not depend on the outcome. The model itself would be formulated as: $Y=\beta 0+\beta 1 *[\text { Time }]+\beta 2^*[\text { Intervention }]+\beta 3^*\left[\text { Time }{ }^* \text { Intervention }\right]+\varepsilon$. As there are different forms of interventions in the study, including discounts, calorie messaging, and combinations of the two, a linear model can be run first to determine which interaction terms (Time * Intervention) should be included. 
+
+In the proposed model, the coefficients of the interaction terms are crucial for assessing the efficacy of interventions. The analysis will concentrate on these coefficients, which vary depending on the study's goals. For instance, to determine if interventions result in higher sales of zero-calorie beverages, all interventions can be collectively analyzed. A positive and significant coefficient for this interaction term would signify a successful increase in sales attributed to the intervention. Similarly, to explore whether combined interventions have a more substantial effect, the focus would shift to the coefficient of the interaction term representing the combined interventions.
+
 # Conclusion
 
 \newpage
+
+# References
 
 # Appendices
 
@@ -93,3 +104,4 @@ In particular, @fig-1 shows some important characteristics of the dataset. First
 
 ![**ACF and PACF by Beverage and Site**](../figs/eda-4_acf-pacf.png){#fig-4}
 :::
+
