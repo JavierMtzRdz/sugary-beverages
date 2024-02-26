@@ -1,83 +1,95 @@
 ---
-title: "**STAT550 Homework No 2: Advise for Evaluating Interventions on Sugary and Zero-Calorie Beverage Consumption”**"
+title: "**STAT550 Homework No 2: Advise for Evaluating Interventions on Sugary and Zero-Calorie Beverage Consumption**"
 author: Son Luu (id), Xihan Qian (id) and Javier Mtz.-Rdz. (94785938)
 pdf-engine: pdflatex
 date: "March 1, 2024"
 date-format: long
+number-sections: true
+number-depth: 4
+editor: visual
 format: 
   pdf:
-    documentclass: report
+    citeproc: false
+    filters: 
+      - at: pre-render
+        path: "../misc/citeproc.lua"
+      - at: pre-render
+        path: "../misc/wordcount.lua"
+    documentclass: article
     header-includes: |
-      \usepackage[left=0.8in,right=0.8in,top=0.7in,footskip=1.5pt]{geometry} 
+      \usepackage[left=0.8in,right=0.8in,
+      top=0.8in,bottom=1in,footskip=0.5in]{geometry} 
       \usepackage{amsmath,amsthm,amssymb,amsfonts}
       \usepackage{mathtools}
-      % enumitem for custom lists
-      \usepackage{enumitem}
-      % Load dsfont this to get proper indicator function (bold 1) with        \mathds{1}:
       \usepackage{dsfont}
       \usepackage{centernot}
       \usepackage[usenames,dvipsnames,table]{xcolor}
       \usepackage{booktabs} % For improved table lines
-      \renewcommand{\arraystretch}{1.3} % Increase row spacing
+      \renewcommand{\arraystretch}{1} % Increase row spacing
       \renewcommand\thefigure{\arabic{figure}}
     fontsize: 12pt
     colorlinks: true
 ---
 
-## Introduction
+```{=tex}
+\thispagestyle{empty}
+\clearpage
+\pagenumbering{arabic}
+```
+# Introduction
 
+Zero-calorie beverages offer an alternative to sugary drinks that can help to avoid the harmful effects of artificial sweeteners. Therefore, it is important to understand what actions can motivate people to switch to these products. The aim of this study is to assess the impact of messaging and discounts on the buying behaviour of zero-calorie and sugary drinks. In particular, it evaluates different interventions, such as discounts with and without explanation, messaging that displays the caloric content, messaging that shows the equivalent fiscal activity, and a combination of both.
 
-Quarto enables you to weave together content and executable code into a finished document. To learn more about Quarto see <https://quarto.org>.
+The primary question under consideration is the effect of each intervention on the consumption of sugary and zero-calorie drinks. Specifically, the study will explore the direction, size, comparison, and impact of interventions on each site, as well as how different interventions interact and compare with each other. To answer these questions, this document discusses the characteristics of the data collected, explores its behaviour, and performs a statistical assessment.
 
-## Data Description and Summaries
+# Data Description and Summaries
 
-To determine the impact of different interventions on the consumption of sugary and zero-calorie beverages, the study collected data on the beverages sold at four cafeterias and three convenience shops across three sites. Daily sales of these beverages were recorded over a period of 221 days, from October 27 to May 23. The resulting dataset includes variables related to … 
+To evaluate the effects of interventions, the study gathered data on beverages sold at four cafeterias and three convenience stores across three sites. The dataset records daily sales of these beverages for a period of 221 days, from October 27 to May 23 (#TODO: corroborate dates), and summarizes the data by site. Nevertheless, the observations for each site start on different dates: site A starts on day 1, site B on day 14, and site C on day 20. In total, there are 631 observations in the dataset.
 
-As a summary, Table \ref{tab:observations} shows  the variables available in the dataset, their classification and how they are measured.
+The dataset includes variables related to time, sales, place, and intervention. The time variables are the count of days since the start of the study and the day of the week. The sales variables include zero-calorie, sugary, 100% juice, orange juice, sports, and total beverages sold, but only zero-calorie and sugary beverages are considered for this analysis. As for place and intervention, there is a variable for each one. @tbl-vars summarizes the variables available in the dataset, their classification, and how they are measured.
 
-Missing data is CAR.
+|          Variable           |    Type     | Unit |
+|:---------------------------:|:-----------:|:----:|
+| Day of the quasi-experiment | Continuous  |  \-  |
+|       Day of the week       | Continuous  |  \-  |
+|            Site             | Categorical |  \-  |
+|        Intervention         | Categorical |  \-  |
+|    Sugary beverages sold    | Continuous  |  \-  |
+| Zero-calorie beverages sold | Continuous  |  \-  |
+|    Other beverages sold     | Continuous  |  \-  |
 
+: **Description of variables** {#tbl-vars tbl-colwidths="[35,25]"}
 
-\begin{table}[htbp]
-\centering
-\caption{\textbf{Description of Observations}}
-\label{tab:observations}
-\begin{tabular}{p{6cm} c p{6cm}}
-\toprule
-\textbf{Variable} & \textbf{Type} & \textbf{Unit}   \\
-\midrule
-Day of the quasi-experiment & Continuous & - \\
-Day of the week & Continuous & - \\
-Site & Categorical & - \\
-Intervention & Categorical & - \\
-Sugary beverages sold & Continuous & Standardized units \\
-Zero-calorie beverages sold & Continuous & - \\
-Other beverages sold & Continuous & - \\
-\bottomrule
-\end{tabular}
-\end{table}
+In addition to the periods that were not recorded at the beginning of the study in sites B and C, there are nine missing values for sales of zero-calorie and sugary beverages. The missing observations correspond to the last week of site B and two days of site C. Aside from the missing information at the beginning and end of the study, the missing values are unrelated to any specific factor. Furthermore, the sales data for other beverages and the total amount have several missing values, but they do not affect this analysis.
 
-## Exploratory Analysis
+# Exploratory Analysis
 
-To start understanding the behavior of the data in this study, 
+Given that the data consists of a time series of sales across three sites, it was necessary to carry out a time-based analysis. In that sense, @fig-1 helps visualize the beverages sold and the shadows behind the lines display the distinct intervention periods. Additionally, @sec-appeda visualization and tests about the relationship among variables, the effect from past observations in the new data points and the decomposition of sugary and zero-calorie sales series in the change by the mean level (trend), the periodicity of the data (seasonal variation) and factors that do not show a pattern (random variation).
 
-![**Sale of sugary and zero-calorie drinks by intervention**](../figs/eda-1_time-serie.png){width="700"} 
+![**Sale of sugary and zero-calorie drinks by intervention**](../figs/eda-1_time-serie.png){#fig-1}
 
-Based on the plot provided, we can observe some important characteristics of the data. Firstly, the measurements for each site began at different times. For example, the first site has 21 pre-intervention observations, whereas the last site only has two. Secondly, the third site experienced a significant increase in sales during most of the first intervention, but afterwards, sales remained at a lower and more stable level. Thirdly, the order of the three calorie messaging interventions was different for each site. Lastly, it is evident from the data that there is a weekly seasonal effect.
+In particular, @fig-1 shows some important characteristics of the dataset. Firstly, the measurements for each site began at different times. Secondly, the third site experienced a significant increase in sales during most of the first intervention, but afterwards, sales remained at a lower and more stable level. Thirdly, the order of the three calorie messaging interventions was different for each site. Lastly, it is evident from the data that there is a weekly seasonal effect.
 
+# Formal analysis
 
-## Formal analysis
+# Conclusion
 
-## Conclusion
+\newpage
 
-## Appendices
+# Appendices
+
+::: {#appendix-count}
+## Detailed Explorarory Analysis {#sec-appeda}
+
+```{=tex}
 \renewcommand\thefigure{A.\arabic{figure}}
 \setcounter{figure}{0}
+```
+![**Correlation matrix of variables**](../figs/eda-5_corr.png){#fig-2}
 
-![**Sale of sugary and zero-calorie drinks by week and site**](../figs/eda-2_season-plot.png){width="700"} 
+![**Sale of sugary and zero-calorie drinks by week and site**](../figs/eda-2_season-plot.png){#fig-3}
 
-![**Decomposition Analysis of Sales for Sugary and Zero-Calorie Beverages**](../figs/eda-3_decomposition.png){width="700"} 
+![**Decomposition Analysis of Sales for Sugary and Zero-Calorie Beverages**](../figs/eda-3_decomposition.png)
 
-![**ACF and PACF by Beverage and Site**](../figs/eda-4_acf-pacf.png){width="700"} 
-
-
+![**ACF and PACF by Beverage and Site**](../figs/eda-4_acf-pacf.png){#fig-4}
+:::
