@@ -2,55 +2,78 @@
 title: "HW2"
 author: Son Luu (id), Xihan Qian (54285556) and Javier Mtz.-Rdz. (94785938)
 pdf-engine: pdflatex
+date: "March 1, 2024"
+date-format: long
+number-sections: true
+number-depth: 4
+editor: visual
 format: 
   pdf:
-    documentclass: report
+    citeproc: false
+    filters: 
+      - at: pre-render
+        path: "../misc/citeproc.lua"
+      - at: pre-render
+        path: "../misc/wordcount.lua"
+    documentclass: article
     header-includes: |
-      \usepackage[left=0.8in,right=0.8in,top=0.7in,footskip=1.5pt]{geometry} 
-      % \usepackage{changepage}
+      \usepackage[left=0.8in,right=0.8in,
+      top=0.8in,bottom=1in,footskip=0.5in]{geometry} 
       \usepackage{amsmath,amsthm,amssymb,amsfonts}
       \usepackage{mathtools}
-      % enumitem for custom lists
-      \usepackage{enumitem}
-      % Load dsfont this to get proper indicator function (bold 1) with      \mathds{1}:
       \usepackage{dsfont}
       \usepackage{centernot}
       \usepackage[usenames,dvipsnames,table]{xcolor}
+      \usepackage{booktabs} % For improved table lines
+      \renewcommand{\arraystretch}{1} % Increase row spacing
+      \renewcommand\thefigure{\arabic{figure}}
     fontsize: 12pt
     colorlinks: true
 bibliography: ../reference/ref.bib
 ---
 
-## Introduction
-
-Quarto enables you to weave together content and executable code into a finished document. To learn more about Quarto see <https://quarto.org>.
-
-## Data Description and Summaries
-
-When you click the **Render** button a document will be generated that includes both content and the output of embedded code. You can embed code like this:
-
-```{r}
-1 + 1
+```{=tex}
+\thispagestyle{empty}
+\clearpage
+\pagenumbering{arabic}
 ```
+# Introduction
 
-You can add options to executable code like this
+Zero-calorie beverages offer an alternative to sugary drinks that can help to avoid the harmful effects of artificial sweeteners. Therefore, it is important to understand what actions can motivate people to switch to these products. The aim of this study is to assess the impact of messaging and discounts on the buying behaviour of zero-calorie and sugary drinks. In particular, it evaluates different interventions, such as discounts with and without explanation, messaging that displays the caloric content, messaging that shows the equivalent fiscal activity, and a combination of both.
 
-```{r}
-#| echo: false
-2 * 2
-```
+The primary question under consideration is the effect of each intervention on the consumption of sugary and zero-calorie drinks. Specifically, the study will explore the direction, size, comparison, and impact of interventions on each site, as well as how different interventions interact and compare with each other. To answer these questions, this document discusses the characteristics of the data collected, explores its behaviour, and performs a statistical assessment.
 
-The `echo: false` option disables the printing of code (only output is displayed).
+# Data Description and Summaries
 
-## Exploratory Analysis
+To evaluate the effects of interventions, the study gathered data on beverages sold at four cafeterias and three convenience stores across three sites. The dataset records daily sales of these beverages for a period of 221 days, from October 27 to May 23 (#TODO: corroborate dates), and summarizes the data by site. Nevertheless, the observations for each site start on different dates: site A starts on day 1, site B on day 14, and site C on day 20. In total, there are 631 observations in the dataset.
 
-When you click the **Render** button a document will be generated that includes both content and the output of embedded code. You can embed code like this:
+The dataset includes variables related to time, sales, place, and intervention. The time variables are the count of days since the start of the study and the day of the week. The sales variables include zero-calorie, sugary, 100% juice, orange juice, sports, and total beverages sold, but only zero-calorie and sugary beverages are considered for this analysis. As for place and intervention, there is a variable for each one. @tbl-vars summarizes the variables available in the dataset, their classification, and how they are measured.
 
+|          Variable           |    Type     | Unit |
+|:---------------------------:|:-----------:|:----:|
+| Day of the quasi-experiment | Continuous  |  \-  |
+|       Day of the week       | Continuous  |  \-  |
+|            Site             | Categorical |  \-  |
+|        Intervention         | Categorical |  \-  |
+|    Sugary beverages sold    | Continuous  |  \-  |
+| Zero-calorie beverages sold | Continuous  |  \-  |
+|    Other beverages sold     | Continuous  |  \-  |
 
+: **Description of variables** {#tbl-vars tbl-colwidths="[35,25]"}
 
-## Formal analysis
+In addition to the periods that were not recorded at the beginning of the study in sites B and C, there are nine missing values for sales of zero-calorie and sugary beverages. The missing observations correspond to the last week of site B and two days of site C. Aside from the missing information at the beginning and end of the study, the missing values are unrelated to any specific factor. Furthermore, the sales data for other beverages and the total amount have several missing values, but they do not affect this analysis.
 
-#### Difference-in-Difference Estimation
+# Exploratory Analysis
+
+Given that the data consists of a time series of sales across three sites, it was necessary to carry out a time-based analysis. In that sense, @fig-1 helps visualize the beverages sold and the shadows behind the lines display the distinct intervention periods. Additionally, @sec-appeda visualization and tests about the relationship among variables, the effect from past observations in the new data points and the decomposition of sugary and zero-calorie sales series in the change by the mean level (trend), the periodicity of the data (seasonal variation) and factors that do not show a pattern (random variation).
+
+![**Sale of sugary and zero-calorie drinks by intervention**](../figs/eda-1_time-serie.png){#fig-1}
+
+In particular, @fig-1 shows some important characteristics of the dataset. Firstly, the measurements for each site began at different times. Secondly, the third site experienced a significant increase in sales during most of the first intervention, but afterwards, sales remained at a lower and more stable level. Thirdly, the order of the three calorie messaging interventions was different for each site. Lastly, it is evident from the data that there is a weekly seasonal effect.
+
+# Formal analysis
+
+## Difference-in-Difference Estimation
 
 DID, or Difference-in-Differences, is a quasi-experimental method that utilizes longitudinal data from intervention and control groups [@angrist_mostly_2008]. This approach is particularly effective in this design, as it aligns with the quasi-experimental nature of the study. This method aims to create a suitable counterfactual for estimating causal effects by comparing changes over time between the groups. The key assumption behind DID is that in the absence of the intervention, the average change in the outcome for the intervention group would have been the same as the average change for the control group. 
 
@@ -58,8 +81,27 @@ Before applying the model, there are a few assumptions to be checked. Most impor
 
 In the proposed model, the coefficients of the interaction terms are crucial for assessing the efficacy of interventions. The analysis will concentrate on these coefficients, which vary depending on the study's goals. For instance, to determine if interventions result in higher sales of zero-calorie beverages, all interventions can be collectively analyzed. A positive and significant coefficient for this interaction term would signify a successful increase in sales attributed to the intervention. Similarly, to explore whether combined interventions have a more substantial effect, the focus would shift to the coefficient of the interaction term representing the combined interventions.
 
-## Conclusion
+# Conclusion
 
 \newpage
 
-## References
+# References
+
+# Appendices
+
+::: {#appendix-count}
+## Detailed Explorarory Analysis {#sec-appeda}
+
+```{=tex}
+\renewcommand\thefigure{A.\arabic{figure}}
+\setcounter{figure}{0}
+```
+![**Correlation matrix of variables**](../figs/eda-5_corr.png){#fig-2}
+
+![**Sale of sugary and zero-calorie drinks by week and site**](../figs/eda-2_season-plot.png){#fig-3}
+
+![**Decomposition Analysis of Sales for Sugary and Zero-Calorie Beverages**](../figs/eda-3_decomposition.png)
+
+![**ACF and PACF by Beverage and Site**](../figs/eda-4_acf-pacf.png){#fig-4}
+:::
+
