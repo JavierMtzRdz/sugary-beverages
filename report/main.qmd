@@ -81,6 +81,10 @@ Before applying the model, there are a few assumptions to be checked. Most impor
 
 In the proposed model, the coefficients of the interaction terms are crucial for assessing the efficacy of interventions. The analysis will concentrate on these coefficients, which vary depending on the study's goals. For instance, to determine if interventions result in higher sales of zero-calorie beverages, all interventions can be collectively analyzed. A positive and significant coefficient for this interaction term would signify a successful increase in sales attributed to the intervention. Similarly, to explore whether combined interventions have a more substantial effect, the focus would shift to the coefficient of the interaction term representing the combined interventions.
 
+## Linear mixed effect model
+
+Linear Mixed Effect (LME) models are statistical models that account for fixed effects, common trends that are present at all levels of the data, as well as random effects, correlation within groups and variation between groups. The inclusion of random effects makes LME especially adept at handling hierarchical and longitudinal data, where observations are grouped into different levels.
+
 # Conclusion
 
 \newpage
