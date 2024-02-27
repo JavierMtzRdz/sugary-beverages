@@ -83,7 +83,14 @@ In the proposed model, the coefficients of the interaction terms are crucial for
 
 ## Linear mixed effect model
 
-Linear Mixed Effect (LME) models are statistical models that account for fixed effects, common trends that are present at all levels of the data, as well as random effects, correlation within groups and variation between groups. The inclusion of random effects makes LME especially adept at handling hierarchical and longitudinal data, where observations are grouped into different levels.
+Linear Mixed Effects (LME) model is a statistical model that accounts for fixed effects, common trends that are present at all levels of the data, as well as random effects, correlation within groups and variation between groups. The inclusion of random effects makes LMM especially adept at handling hierarchical and longitudinal data, where observations are grouped into different levels.
+
+For the data at hand, it is recommended to run a linear regression for each site - intervention combination and compare the estimated parameters. If there are significant differences in estimation for a factor, then a random effect specific to that factor needs to be included in the final LME model.
+
+
+
+
+
 
 # Conclusion
 
