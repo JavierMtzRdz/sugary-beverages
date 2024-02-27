@@ -87,7 +87,7 @@ Linear Mixed Effects (LME) model is a statistical model that accounts for fixed 
 
 For the data at hand, it is recommended to run a linear regression for each site - intervention combination and compare the estimated parameters. If there are significant differences in estimation for a factor, then a random effect specific to that factor needs to be included in the final LME model.
 
-
+After model fitting, the assumption that the error terms are independent identically distributed Normal variables with mean zero for LME needs to be confirmed by plotting the residuals.
 
 
 
