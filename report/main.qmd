@@ -89,7 +89,7 @@ For the data at hand, it is recommended to run a linear regression for each site
 
 ## Model diagnostic
 
-Before model fitting, assumptions on data patterns can be confirmed by plotting by groups. After model fitting, assumptions on error terms can be confirmed by plotting the residuals and their QQ plot. Both DID and LME need to be run to check if their results are consistent with each other and if not, what would be the reason for their disagreement.
+Before model fitting, assumptions on data patterns can be confirmed by plotting by groups. After model fitting, assumptions on error terms can be confirmed by plotting the residuals and their QQ plot. Both DID and LME need to be run to check if their results are consistent with each other and if not, what would be the reason for their disagreement. A model selection criterion such as AIC or likelihood ratio can be used to choose between DID and LME as the final model.
 
 
 
