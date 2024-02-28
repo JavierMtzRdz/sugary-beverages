@@ -73,7 +73,10 @@ sug_bev_long <- sug_bev %>%
                                "dismes" = "Discount +\nmessaging",
                                "cal" = "Caloric content \nmessaging",
                                "excer" = "Exercise equivalents \nmessaging",
-                               "both" = "Both \nmessages"))
+                               "both" = "Both \nmessages")) %>% 
+  left_join(sug_bev %>% select(count, site, total),
+            by = join_by(count, site)) %>% 
+  mutate(values_percent = values/total) 
 
 # Plots -----
 
@@ -113,6 +116,48 @@ sug_bev_long %>%
 
 
 ggsave("figs/eda-1_time-serie.png",
+       bg = "transparent",
+       width = 200,                 # Ancho de la gráfica
+       height = 120,
+       units = "mm",
+       dpi = 300)
+
+## Sellings by site and category as %-----
+
+sug_bev_long %>% 
+  ggplot(aes(x = count, 
+             y = values_percent, 
+             group = beverage,
+             color = beverage)) +
+  geom_col(aes(y = Inf,
+               fill = fct_inorder(intervention)),
+           color = NA,
+           width = 1,
+           alpha = 0.25) +
+  facet_wrap(~site,
+             scales = "free_y",
+             ncol = 1) +
+  geom_line() +
+  scale_x_continuous(expand = expansion(mult = c(0.0, 0.0))) +
+  scale_color_jmr(guide = guide_legend(
+    nrow = 2,
+    direction = "horizontal",
+    title.position = "top")) +
+  scale_fill_jmr(palette = "multiple",
+                 guide = guide_legend(
+                   direction = "horizontal",
+                   title.position = "top")) +
+  labs(colour = "Beverage",
+       fill = "Intervention periods",
+       x = "Days since the start of the study",
+       y = "Sold beverages",
+       caption = "Source: client submission. ") +
+  theme_jmr(legend.spacing = unit(0.5, "cm"),
+            legend.key.height = unit(0.7, "cm"),
+            text = element_text(family = "Times New Roman"))
+
+
+ggsave("figs/eda-1.1_time-serie-percent.png",
        bg = "transparent",
        width = 200,                 # Ancho de la gráfica
        height = 120,
@@ -188,11 +233,48 @@ sug_bev_decompos <- sug_bev_ts %>%
               select(count, site, intervention), 
             by = join_by(count, site))
 
+## Decomposed dataset with percent----
+sug_bev_ts_per <- sug_bev %>% 
+  as_tsibble(index = count,
+             key = c(site)) %>% 
+  tsibble::fill_gaps() %>% 
+  transmute(site, count, 
+            zero_cal = zero_cal/total, 
+            sugary = sugary / total) %>% 
+  zoo::na.locf()
+
+sug_bev_decompos_per <- sug_bev_ts_per %>% 
+  split(.$site) %>%
+  map(~ model(., stl = classical_decomposition(zero_cal ~ season(7)))) %>%
+  map_df(components) %>% 
+  transmute(site, count, 
+            original = zero_cal, 
+            beverage = "Zero-calorie",
+            trend, seasonal, 
+            random, season_adjust) %>% 
+  as_tibble() %>% 
+  bind_rows(sug_bev_ts_per %>% 
+              split(.$site) %>%
+              map(~ model(., stl = classical_decomposition(sugary ~ season(7)))) %>%
+              map_df(components) %>% 
+              transmute(site, count, 
+                        original = sugary, 
+                        beverage = "Sugary",
+                        trend, seasonal, 
+                        random, season_adjust)) %>% 
+  left_join(sug_bev %>% 
+              select(count, site, intervention), 
+            by = join_by(count, site))
+
 ### Save decomposed dataset -----
 # sug_bev_decompos %>% 
 #   write_csv("gendata/sug_bev_decompos.csv")
+# sug_bev_decompos_per %>%
+#   write_csv("gendata/sug_bev_decompos_per.csv")
+
 ### Save decomposed dataset -----
 sug_bev_decompos <- read_csv("gendata/sug_bev_decompos.csv")
+sug_bev_decompos_per <- read_csv("gendata/sug_bev_decompos_per.csv")
 
 ### Plot decomposition ----
 sug_bev_decompos %>% 
@@ -203,6 +285,8 @@ sug_bev_decompos %>%
   ggplot(aes(x = count, 
              y = value,
              color = beverage)) +
+  # facet_grid(vars(fct_inorder(name)), vars(site),
+  #                               scales = "free") +
   ggh4x::facet_grid2(vars(fct_inorder(name)), vars(site),
                      scales = "free",
                      independent = "y") +
@@ -223,6 +307,43 @@ sug_bev_decompos %>%
 
 
 ggsave("figs/eda-3_decomposition.png",
+       bg = "transparent",
+       width = 200,                 # Ancho de la gráfica
+       height = 120,
+       units = "mm",
+       dpi = 300)
+
+### Plot decomposition per ----
+sug_bev_decompos_per %>% 
+  select(-season_adjust, -intervention) %>% 
+  pivot_longer(c(original, trend,
+                 seasonal, random)) %>% 
+  mutate(name = str_to_sentence(name)) %>% 
+  ggplot(aes(x = count, 
+             y = value,
+             color = beverage)) +
+  # facet_grid(vars(fct_inorder(name)), vars(site),
+  #            scales = "free") +
+  ggh4x::facet_grid2(vars(fct_inorder(name)), vars(site),
+                     scales = "free",
+                     independent = "y") +
+  geom_line(size = 0.3) +
+  scale_x_continuous(expand = expansion(mult = c(0.02, 0.02))) +
+  scale_color_jmr(guide = guide_legend(
+    nrow = 1,
+    direction = "horizontal",
+    title.position = "left")) +
+  labs(colour = "Beverage",
+       fill = "Intervention periods",
+       x = "Days since the start of the study",
+       y = "Sold beverages") +
+  theme_jmr(legend.spacing = unit(0.5, "cm"),
+            legend.key.height = unit(0.7, "cm"),
+            text = element_text(family = "Times New Roman"))
+
+
+
+ggsave("figs/eda-3-2_decomposition_per.png",
        bg = "transparent",
        width = 200,                 # Ancho de la gráfica
        height = 120,
@@ -311,6 +432,57 @@ sug_bev_acf <- sug_bev_ts %>%
                                                 ic_alpha = qnorm((1 + (1 - 0.05))/2)/
                                                   sqrt(n.used))})) 
 
+### Estimate ACF and PAC per
+
+sug_bev_acf_per <- sug_bev_ts_per %>% 
+  split(.$site) %>%
+  map(~ pull(., zero_cal)) %>%
+  map(~ acf(., plot= F)) %>%
+  map(~ with(., data.frame(lag, acf, n.used))) %>% 
+  map2_df(unique(sug_bev_ts_per$site), 
+          function (.x, .y) {mutate(.x,
+                                    site = .y,
+                                    beverage = "Zero-calorie",
+                                    test = "ACF",
+                                    ic_alpha = qnorm((1 + (1 - 0.05))/2)/
+                                      sqrt(n.used))}) %>% 
+  bind_rows(sug_bev_ts_per %>% 
+              split(.$site) %>%
+              map(~ pull(., zero_cal)) %>%
+              map(~ pacf(., plot= F)) %>%
+              map(~ with(., data.frame(lag, acf, n.used))) %>% 
+              map2_df(unique(sug_bev_ts_per$site), 
+                      function (.x, .y) {mutate(.x,
+                                                site = .y,
+                                                beverage = "Zero-calorie",
+                                                test = "PACF",
+                                                ic_alpha = qnorm((1 + (1 - 0.05))/2)/
+                                                  sqrt(n.used))}),
+            sug_bev_ts_per %>% 
+              split(.$site) %>%
+              map(~ pull(., sugary)) %>%
+              map(~ acf(., plot= F)) %>%
+              map(~ with(., data.frame(lag, acf, n.used))) %>% 
+              map2_df(unique(sug_bev_ts_per$site), 
+                      function (.x, .y) {mutate(.x,
+                                                site = .y,
+                                                beverage = "Sugary",
+                                                test = "ACF",
+                                                ic_alpha = qnorm((1 + (1 - 0.05))/2)/
+                                                  sqrt(n.used))}),
+            sug_bev_ts_per %>% 
+              split(.$site) %>%
+              map(~ pull(., sugary)) %>%
+              map(~ pacf(., plot= F)) %>%
+              map(~ with(., data.frame(lag, acf, n.used))) %>% 
+              map2_df(unique(sug_bev_ts_per$site), 
+                      function (.x, .y) {mutate(.x,
+                                                site = .y,
+                                                beverage = "Sugary",
+                                                test = "PACF",
+                                                ic_alpha = qnorm((1 + (1 - 0.05))/2)/
+                                                  sqrt(n.used))})) 
+
 ### Plot ACF
 sug_bev_acf %>% 
   filter(test == "ACF") %>% 
@@ -379,6 +551,47 @@ sug_bev_acf %>%
             text = element_text(family = "Times New Roman"))
 
 ggsave("figs/eda-4_acf-pacf.png",
+       bg = "transparent",
+       width = 200,                 # Ancho de la gráfica
+       height = 120,
+       units = "mm",
+       dpi = 300)
+
+## Combined plot per ------
+sug_bev_acf_per %>% 
+  mutate(lag = ifelse(beverage == "Sugary", 
+                      lag - 0.12, lag + 0.12)) %>% 
+  ggplot(aes(x = lag, y = acf,
+             color = beverage)) +
+  ggh4x::facet_grid2(vars(test), vars(site),
+                     switch = "y",
+                     scales = "free") +
+  geom_hline(aes(yintercept = 0)) +
+  geom_segment(aes(xend = lag,
+                   yend = 0)) +
+  geom_point(size = 0.4) +
+  geom_ribbon(aes(ymin = -ic_alpha, ymax=ic_alpha,
+                  x = ifelse(lag > 10, lag + 1, lag - 1),
+                  fill = "Limit of significance (5%)"),
+              alpha = 0.2,
+              linetype = "dashed",
+              color = "#FF483B") +
+  scale_linetype_manual(values = "dashed") +
+  scale_x_continuous(expand = expansion(mult = c(0.0, 0.0))) +
+  scale_color_jmr(guide = guide_legend(
+    nrow = 1,
+    direction = "horizontal",
+    title.position = "left")) +
+  labs(colour = "Beverage",
+       fill = element_blank(),
+       x = "Lags",
+       y = element_blank(),
+       linetype = element_blank()) +
+  theme_jmr(legend.spacing = unit(0.5, "cm"),
+            legend.key.height = unit(0.7, "cm"),
+            text = element_text(family = "Times New Roman"))
+
+ggsave("figs/eda-4-2_acf-pacf-per.png",
        bg = "transparent",
        width = 200,                 # Ancho de la gráfica
        height = 120,
