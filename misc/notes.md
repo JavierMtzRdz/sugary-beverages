@@ -1,37 +1,51 @@
 # Notes
 
-## Tasks
 
-Everyone:
 
-- Add questions. 
+## EDA:
 
-Javier:
-
-- Share GitHub accounts with reviewers. 
-- Create the dataset with trends (done)
-  - It can be accesed with ```sug_bev_decompos <- read_csv("gendata/sug_bev_decompos.csv")```
-- Finish summary and EDA sections. 
-- Create an EDA analysis document (it is the code)
-- Scatter plot to look at the interaction. 
-
-Henry:
-
-* DID
-  * Assumptions
-
-Son: 
-
-* LME model
-  * Assumptions
+ - We will plot the results with the trend and explain that. 
 
 
 
 ## Formal Analysis
 
-* Methods:
-  * Trends.
-  * DID. 
-  * LME model.
+#### Data preparation (Javier)
 
- 
+* Modification of the data. 
+  * Remove pre-intervention. 
+  * Recode follows as a control for the first data
+  * Should we remove the washout? Yes
+  * Create since the start of the intervention
+
+#### ANCONA (Henry)
+
+* Definition
+* Assumption
+* Any 
+
+#### LME (Son)
+
+* Definition
+* Assumption
+* Any 
+
+#### Recommendation (together)
+
+* Check assumptions post-running (Henry)
+
+1. Did the interventions lead to increases in zero-calorie beverages and/or
+   decreases in sugary beverages?
+1. Do the effects differ by site?
+1. Does the combination of interventions lead to larger effects?
+1. Does the calorie-equivalent messaging have a larger impact than the simple
+   calorie admonishment?
+
+
+
+## Conclusion (Henry)
+
+
+
+
+
