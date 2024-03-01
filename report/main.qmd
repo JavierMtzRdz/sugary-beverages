@@ -73,11 +73,15 @@ In particular, @fig-1 shows some important characteristics of the dataset. First
 
 # Formal analysis
 
-## ANCOVA
+## ANOVA/ANCOVA
 
-Analysis of Covariance (ANCOVA) is a statistical technique that merges aspects of variance analysis with linear regression to evaluate differences across various groups while adjusting for variance from other variables, known as covariates, which is time in this study. ANCOVA will allow controls for pre-existing differences across the three hospital sites and any baseline consumption patterns. This is crucial, considering the interventions' diversity ranging from visual calorie content presentations to price discounts and their combinations. By adjusting for these variables, ANCOVA not only enhances the accuracy of the findings but also provides a deeper understanding of each intervention's unique contribution. Given the multi-site, quasi-experimental design of your study, ANCOVA's ability to account for covariates will be particularly beneficial in isolating the true effects of your interventions, ensuring that any observed changes in beverage consumption can be directly attributed to your strategies, rather than external or site-specific factors.
+ANOVA (Analysis of Variance) is a statistical method used to compare the means of three or more samples, determining if at least one sample mean significantly differs from the others. It's instrumental in experiments aimed at evaluating the effectiveness of different interventions, such as those designed to encourage the selection of zero-calorie beverages over sugary options in hospital settings. By examining the variance within and between intervention groups, ANOVA facilitates understanding whether observed differences in beverage consumption are attributable to the interventions or occur by chance.
+
+This approach offers the advantage of simplicity and clear interpretation, allowing researchers to assess the relative effectiveness of each intervention. However, ANOVA's limitation lies in its inability to account for external variables that could influence outcomes, such as baseline consumption patterns or hospital site characteristics. Unlike ANCOVA, which adjusts for these covariates, ANOVA assumes all group differences result from the interventions themselves, which could lead to oversimplified conclusions. Despite this, ANOVA remains valuable for initial analysis, with its limitations highlighting the need for a comprehensive approach, possibly incorporating ANCOVA, to fully understand the interventions' impacts on beverage selection.
 
 # Conclusion
+
+The study employs ANOVA/ANCOVA and LME models to analyze the effectiveness of interventions on beverage sales across hospitals, addressing four research questions. ANOVA models initially identify differences in intervention effects, while LME models are recommended for deeper analysis when significant variations are observed. This approach ensures a thorough investigation into how each intervention influences beverage choices, the impact of site characteristics, and the effectiveness of calorie information and exercise prompts. The study's methodology provides a clear path to understanding which interventions work best, promoting healthier beverage consumptions.
 
 \newpage
 
