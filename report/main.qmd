@@ -96,7 +96,7 @@ For the data at hand, it is recommended to run a linear regression for each site
 For the first and second question, we recommend using the following ANOVA model 
 $$\text{Sales} = \beta_0+\beta_1\times\text{Intervention}+\beta_2\times\text{Site}$$
 with the pre-intervention period being the reference. For the third question, we recommend using the following ANOVA model 
-$$\text{Sales} = \beta_0+\beta_1\times\text{Calorie } +\beta_2\times\text{Excercise}$$
+$$\text{Sales} = \beta_0+\beta_1\times\text{Calorie } +\beta_2\times\text{Exercise}$$
 with the combination period being the reference. For the final question, we recommend using the following ANOVA model 
 $$\text{Sales} = \beta_0+\beta_1\times\text{Calorie}$$
 with the calorie admonishment period being the reference. In the model for the second question, we recommend to first run a preliminary ANOVA for each of the intervention and the pre-intervention period. If there are any significant differences between the estimated coefficients between the interventions, a LME model with intervention dependent random effects is recommended. A similar strategy needs to be applied to the other questions, but the preliminary ANOVA is performed for each site and site dependent random effects is added when differences are significant instead. The reason for these preliminary analyses is to determine if LME is necessary or not. Note that the sales in these model refer to the trend extracted in the EDA step. After the models are fitted, the residuals need to be visualized via scatter plot, autocorrelation plot and QQ-plot to confirm the independent, equal variance and normal error assumptions for both ANOVA and LME.
