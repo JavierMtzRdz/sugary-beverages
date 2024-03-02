@@ -122,7 +122,7 @@ sug_bev_long %>%
 ggsave("figs/eda-1_time-serie.png",
        bg = "transparent",
        width = 200,                 # Ancho de la gráfica
-       height = 120,
+       height = 110,
        units = "mm",
        dpi = 300)
 
