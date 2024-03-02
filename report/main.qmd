@@ -1,6 +1,6 @@
 ---
 title: "**STAT550 Homework No 2: Advise for Evaluating Interventions on Sugary and Zero-Calorie Beverage Consumption**"
-author: Son Luu (id), Xihan Qian (54285556) and Javier Mtz.-Rdz. (94785938)
+author: Son Luu (71843379), Xihan Qian (54285556) and Javier Mtz.-Rdz. (94785938)
 pdf-engine: pdflatex
 date: "March 1, 2024"
 date-format: long
