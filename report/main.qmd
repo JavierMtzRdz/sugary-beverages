@@ -59,7 +59,7 @@ The dataset includes variables related to time, sales, place, and intervention. 
 | Zero-calorie beverages sold | Continuous  |  \-  |
 |    Other beverages sold     | Continuous  |  \-  |
 
-: **Description of variables** {#tbl-vars tbl-colwidths="[35,25]"}
+: **Description of variables** {#tbl-vars tbl-colwidths="\[35,25\]"}
 
 In addition to the periods that were not recorded at the beginning of the study in sites B and C, there are nine missing values for sales of zero-calorie and sugary beverages. The missing observations correspond to the last week of site B and two days of site C. Aside from the missing information at the beginning and end of the study, the missing values are unrelated to any specific factor. Furthermore, the sales data for other beverages and the total amount have several missing values, but they do not affect this analysis.
 
@@ -73,13 +73,11 @@ In particular, @fig-1 shows some important characteristics of the dataset. First
 
 # Formal analysis
 
-## Difference-in-Difference Estimation
+## ANOVA/ANCOVA
 
-DID, or Difference-in-Differences, is a quasi-experimental method that utilizes longitudinal data from intervention and control groups [@angrist_mostly_2008]. This approach is particularly effective in this design, as it aligns with the quasi-experimental nature of the study. This method aims to create a suitable counterfactual for estimating causal effects by comparing changes over time between the groups. The key assumption behind DID is that in the absence of the intervention, the average change in the outcome for the intervention group would have been the same as the average change for the control group. 
+ANOVA (Analysis of Variance) is a statistical method used to compare the means of three or more samples, determining if at least one sample mean significantly differs from the others. It's instrumental in experiments aimed at evaluating the effectiveness of different interventions, such as those designed to encourage the selection of zero-calorie beverages over sugary options in hospital settings. By examining the variance within and between intervention groups, ANOVA facilitates understanding whether observed differences in beverage consumption are attributable to the interventions or occur by chance.
 
-Before applying the model, there are a few assumptions to be checked. Most importantly, there need to be parallel trends between the intervention and the control group. Moreover, at the baseline, the allocation of the intervention should not depend on the outcome. The model itself would be formulated as: $Y=\beta 0+\beta 1 *[\text { Time }]+\beta 2^*[\text { Intervention }]+\beta 3^*\left[\text { Time }{ }^* \text { Intervention }\right]+\varepsilon$. As there are different forms of interventions in the study, including discounts, calorie messaging, and combinations of the two, a linear model can be run first to determine which interaction terms (Time * Intervention) should be included. 
-
-In the proposed model, the coefficients of the interaction terms are crucial for assessing the efficacy of interventions. The analysis will concentrate on these coefficients, which vary depending on the study's goals. For instance, to determine if interventions result in higher sales of zero-calorie beverages, all interventions can be collectively analyzed. A positive and significant coefficient for this interaction term would signify a successful increase in sales attributed to the intervention. Similarly, to explore whether combined interventions have a more substantial effect, the focus would shift to the coefficient of the interaction term representing the combined interventions.
+This approach offers the advantage of simplicity and clear interpretation, allowing researchers to assess the relative effectiveness of each intervention. However, ANOVA's limitation lies in its inability to account for external variables that could influence outcomes, such as baseline consumption patterns or hospital site characteristics. Unlike ANCOVA, which adjusts for these covariates, ANOVA assumes all group differences result from the interventions themselves, which could lead to oversimplified conclusions. Despite this, ANOVA remains valuable for initial analysis, with its limitations highlighting the need for a comprehensive approach, possibly incorporating ANCOVA, to fully understand the interventions' impacts on beverage selection.
 
 ## Linear mixed effect model
 
@@ -103,6 +101,8 @@ If the sales trends are found to be linear for each intervention period, the tim
 
 
 # Conclusion
+
+The study employs ANOVA/ANCOVA and LME models to analyze the effectiveness of interventions on beverage sales across hospitals, addressing four research questions. ANOVA models initially identify differences in intervention effects, while LME models are recommended for deeper analysis when significant variations are observed. This approach ensures a thorough investigation into how each intervention influences beverage choices, the impact of site characteristics, and the effectiveness of calorie information and exercise prompts. The study's methodology provides a clear path to understanding which interventions work best, promoting healthier beverage consumptions.
 
 \newpage
 
@@ -129,4 +129,3 @@ If the sales trends are found to be linear for each intervention period, the tim
 
 ![**ACF and PACF by Beverage and Site**](../figs/eda-4_acf-pacf.png){#fig-4}
 :::
-
