@@ -1,6 +1,6 @@
 ---
 title: "**STAT550 Homework No 2: Advise for Evaluating Interventions on Sugary and Zero-Calorie Beverage Consumption**"
-author: Son Luu (id), Xihan Qian (54285556) and Javier Mtz.-Rdz. (94785938)
+author: Son Luu (71843379), Xihan Qian (54285556) and Javier Mtz.-Rdz. (94785938)
 pdf-engine: pdflatex
 date: "March 1, 2024"
 date-format: long
@@ -39,25 +39,23 @@ bibliography: ../reference/ref.bib
 ```
 # Introduction
 
-Zero-calorie beverages offer an alternative to sugary drinks that can help to avoid the harmful effects of artificial sweeteners. Therefore, it is important to understand what actions can motivate people to switch to these products. The aim of this study is to assess the impact of messaging and discounts on the buying behaviour of zero-calorie and sugary drinks. In particular, it evaluates different interventions, such as discounts with and without explanation, messaging that displays the caloric content, messaging that shows the equivalent fiscal activity, and a combination of both.
-
-The primary question under consideration is the effect of each intervention on the consumption of sugary and zero-calorie drinks. Specifically, the study will explore the direction, size, comparison, and impact of interventions on each site, as well as how different interventions interact and compare with each other. To answer these questions, this document discusses the characteristics of the data collected, explores its behaviour, and performs a statistical assessment.
+Zero-calorie beverages offer an alternative to sugary drinks that can help to avoid the harmful effects of artificial sweeteners. Therefore, it is important to understand what actions can motivate people to switch to these products. The aim of this study is to assess the impact of messaging and discounts on the buying behaviour of zero-calorie and sugary drinks. In this regard, the statistical advise recommends to indicate how to solve four questions. The first question to be addressed is whether these interventions lead to increased consumption of zero-calorie beverages and decreased consumption of sugary beverages. Subsequently, the study will also investigate whether the effects vary across different sites (second question), and whether combining interventions —messaging + discount and both messages— results in larger effects (third question). Lastly, the study will compare the effectiveness of calorie-equivalent messaging with simple calorie admonishment (fourth question).
 
 # Data Description and Summaries
 
-To evaluate the effects of interventions, the study gathered data on beverages sold at four cafeterias and three convenience stores across three sites. The dataset records daily sales of these beverages for a period of 221 days, from October 27 to May 23 (#TODO: corroborate dates), and summarizes the data by site. Nevertheless, the observations for each site start on different dates: site A starts on day 1, site B on day 14, and site C on day 20. In total, there are 631 observations in the dataset.
+To evaluate the effects of interventions, the study gathered data on beverages sold at four cafeterias and three convenience stores across three sites. The dataset recorded daily sales of these beverages for a period of 221 days and summarizes the data by site. Nevertheless, the observations for each site start on different dates: site A starts on day 1, site B on day 14, and site C on day 20. In total, there are 631 observations in the dataset.
 
-The dataset includes variables related to time, sales, place, and intervention. The time variables are the count of days since the start of the study and the day of the week. The sales variables include zero-calorie, sugary, 100% juice, orange juice, sports, and total beverages sold, but only zero-calorie and sugary beverages are considered for this analysis. As for place and intervention, there is a variable for each one. @tbl-vars summarizes the variables available in the dataset, their classification, and how they are measured.
+The dataset includes variables related to time, sales, site, and intervention. The time variables are the count of days since the start of the study and the day of the week. The sales variables include zero-calorie, sugary, 100% juice, orange juice, sports and total beverages sold, but only zero-calorie and sugary beverages are considered for this analysis. As for site and intervention, there is a variable for each one. @tbl-vars summarizes the variables available in the dataset, their classification, and how they are measured.
 
-|          Variable           |    Type     | Unit |
-|:---------------------------:|:-----------:|:----:|
-| Day of the quasi-experiment | Continuous  |  \-  |
-|       Day of the week       | Continuous  |  \-  |
-|            Site             | Categorical |  \-  |
-|        Intervention         | Categorical |  \-  |
-|    Sugary beverages sold    | Continuous  |  \-  |
-| Zero-calorie beverages sold | Continuous  |  \-  |
-|    Other beverages sold     | Continuous  |  \-  |
+|          Variable           |    Type     |
+|:---------------------------:|:-----------:|
+| Day of the quasi-experiment | Continuous  |
+|       Day of the week       | Continuous  |
+|            Site             | Categorical |
+|        Intervention         | Categorical |
+|    Sugary beverages sold    | Continuous  |
+| Zero-calorie beverages sold | Continuous  |
+|    Other beverages sold     | Continuous  |
 
 : **Description of variables** {#tbl-vars tbl-colwidths="\[35,25\]"}
 
@@ -65,7 +63,9 @@ In addition to the periods that were not recorded at the beginning of the study 
 
 # Exploratory Analysis
 
-Given that the data consists of a time series of sales across three sites, it was necessary to carry out a time-based analysis. In that sense, @fig-1 helps visualize the beverages sold and the shadows behind the lines display the distinct intervention periods. Additionally, @sec-appeda visualization and tests about the relationship among variables, the effect from past observations in the new data points and the decomposition of sugary and zero-calorie sales series in the change by the mean level (trend), the periodicity of the data (seasonal variation) and factors that do not show a pattern (random variation).
+Given that the data consists of a time series of sales across three sites, it was necessary to carry out a time-based analysis. In that sense, @fig-1 helps visualize the beverages sold and the shadows behind the lines display the distinct intervention periods by site.[^1] Additionally, @sec-appeda visualization and tests about the relationship among variables, the effect from past observations in the new data points and the decomposition of sugary and zero-calorie sales series in the change by the mean level (trend), the periodicity of the data (seasonal variation) and factors that do not show a pattern (random variation).
+
+[^1]: We are using the client's submission names for sites, but they may not correspond to the same sites in the submission. Here, A corresponds to chop, B to NF and C to NS.
 
 ![**Sale of sugary and zero-calorie drinks by intervention**](../figs/eda-1_time-serie.png){#fig-1}
 
@@ -81,27 +81,17 @@ Secondly, as sites two and three have a short pre-intervention period, it is nec
 
 ## ANOVA/ANCOVA
 
-ANOVA (Analysis of Variance) is a statistical method used to compare the means of three or more samples, determining if at least one sample mean significantly differs from the others. It's instrumental in experiments aimed at evaluating the effectiveness of different interventions, such as those designed to encourage the selection of zero-calorie beverages over sugary options in hospital settings. By examining the variance within and between intervention groups, ANOVA facilitates understanding whether observed differences in beverage consumption are attributable to the interventions or occur by chance.
+ANOVA (Analysis of Variance) is a statistical method used to compare the means of three or more samples, determining if at least one sample mean significantly differs from the others. It's instrumental in experiments aimed at evaluating the effectiveness of different interventions, in this study to encourage the selection of zero-calorie beverages over sugary options in hospital settings. By examining the variance within and between intervention groups, ANOVA facilitates understanding whether observed differences in beverage consumption are attributable to the interventions or occur by chance.
 
-This approach offers the advantage of simplicity and clear interpretation, allowing researchers to assess the relative effectiveness of each intervention. However, ANOVA's limitation lies in its inability to account for external variables that could influence outcomes, such as baseline consumption patterns or hospital site characteristics. Unlike ANCOVA, which adjusts for these covariates, ANOVA assumes all group differences result from the interventions themselves, which could lead to oversimplified conclusions. Despite this, ANOVA remains valuable for initial analysis, with its limitations highlighting the need for a comprehensive approach, possibly incorporating ANCOVA, to fully understand the interventions' impacts on beverage selection.
+However, ANOVA's limitation lies in its inability to account for external variables that could influence outcomes, such as baseline consumption patterns or hospital site characteristics. Despite this, ANOVA remains valuable for initial analysis, with its limitations highlighting the need for a comprehensive approach, possibly incorporating ANCOVA, to fully understand the interventions' impacts on beverage selection.
 
 ## Linear mixed effect model
 
 Linear Mixed Effects (LME) model is a statistical model that accounts for fixed effects, common trends that are present at all levels of the data, as well as random effects, correlation within groups and variation between groups. The inclusion of random effects makes LME especially adept at handling hierarchical and longitudinal data, where observations are grouped into different levels. The error terms in LME models are assumed to be independent identically distributed Normal variables with mean zero.
 
-For the data at hand, it is recommended to run a linear regression for each site - intervention combination and compare the estimated parameters. If there are significant differences in estimation for a factor, then a random effect specific to that factor needs to be included in the final LME model.
-
 ## Recommendation
 
-For the first and second question, we recommend using the following ANOVA model 
-$$\text{Sales} = \beta_0+\beta_1\times\text{Intervention}+\beta_2\times\text{Site}$$
-with the pre-intervention period being the reference. For the third question, we recommend using the following ANOVA model 
-$$\text{Sales} = \beta_0+\beta_1\times\text{Calorie } +\beta_2\times\text{Exercise}$$
-with the combination period being the reference. If the interest is also the effect of combining discount and messaging then following model is recommended
-$$\text{Sales} = \beta_0+\beta_1\times\text{Discount }$$
-with the discount plus messaging as the reference. For the final question, we recommend using the following ANOVA model 
-$$\text{Sales} = \beta_0+\beta_1\times\text{Calorie}$$
-with the calorie admonishment period being the reference. In the model for the second question, we recommend to first run a preliminary ANOVA for each of the intervention and the pre-intervention period. If there are any significant differences between the estimated coefficients between the interventions, a LME model with intervention dependent random effects is recommended. A similar strategy needs to be applied to the other questions, but the preliminary ANOVA is performed for each site and site dependent random effects is added when differences are significant instead. The reason for these preliminary analyses is to determine if LME is necessary or not. Note that the sales in these model refer to the trend extracted in the EDA step. After the models are fitted, the residuals need to be visualized via scatter plot, autocorrelation plot and QQ-plot to confirm the independent, equal variance and normal error assumptions for both ANOVA and LME.
+For the first and second question, we recommend using the following ANOVA model $$\text{Sales} = \beta_0+\beta_1\times\text{Intervention}+\beta_2\times\text{Site}$$ with the pre-intervention period being the reference. For the third question, we recommend using the following ANOVA model $$\text{Sales} = \beta_0+\beta_1\times\text{Calorie } +\beta_2\times\text{Exercise}$$ with the combination period being the reference. If the interest is also the effect of combining discount and messaging then following model is recommended $$\text{Sales} = \beta_0+\beta_1\times\text{Discount }$$ with the discount plus messaging as the reference. For the final question, we recommend using the following ANOVA model $$\text{Sales} = \beta_0+\beta_1\times\text{Calorie}$$ with the calorie admonishment period being the reference. In the model for the second question, we recommend to first run a preliminary ANOVA for each of the intervention and the pre-intervention period. If there are any significant differences between the estimated coefficients between the interventions, a LME model with intervention dependent random effects is recommended. A similar strategy needs to be applied to the other questions, but the preliminary ANOVA is performed for each site and site dependent random effects is added when differences are significant instead. The reason for these preliminary analyses is to determine if LME is necessary or not. Note that the sales in these model refer to the trend extracted in the EDA step. After the models are fitted, the residuals need to be visualized via scatter plot, autocorrelation plot and QQ-plot to confirm the independent, equal variance and normal error assumptions for both ANOVA and LME.
 
 If the sales trends are found to be linear for each intervention period, the time coviariate can be added to the models above, turning them into ANCOVA models. In this case, only the pre-intervention period before the third intervention should be kept for the analysis as the time covariate needs to be reset for each intervention period as well as the pre-intervention period.
 
@@ -127,11 +117,7 @@ The study employs ANOVA/ANCOVA and LME models to analyze the effectiveness of in
 \renewcommand\thefigure{A.\arabic{figure}}
 \setcounter{figure}{0}
 ```
-![**Correlation matrix of variables**](../figs/eda-5_corr.png){#fig-2}
+![**ACF and PACF by Beverage and Site**](../figs/eda-4_acf-pacf.png){#fig-2}
 
-![**Sale of sugary and zero-calorie drinks by week and site**](../figs/eda-2_season-plot.png){#fig-3}
-
-![**Decomposition Analysis of Sales for Sugary and Zero-Calorie Beverages**](../figs/eda-3_decomposition.png)
-
-![**ACF and PACF by Beverage and Site**](../figs/eda-4_acf-pacf.png){#fig-4}
+![**Decomposition Analysis of Sales for Sugary and Zero-Calorie Beverages**](../figs/eda-3_decomposition.png){#fig-3}
 :::

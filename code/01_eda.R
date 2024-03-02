@@ -42,7 +42,11 @@ sug_bev <- read_csv("rawdata/june1data.csv") %>%
                              1, 0),
          week_count = cumsum(week_count),
          date = as_date(count, # It does not match the dates very well.
-                        origin = "00-10-25 UTC")) %>% 
+                        origin = "00-10-25 UTC"),
+         site = recode(site,
+                       "chop" = "A",
+                       "HF" = "B",
+                       "NS" = "C")) %>% 
   arrange(site, count)
 
 glimpse(sug_bev)
@@ -267,7 +271,7 @@ sug_bev_decompos_per <- sug_bev_ts_per %>%
             by = join_by(count, site))
 
 ### Save decomposed dataset -----
-# sug_bev_decompos %>% 
+# sug_bev_decompos %>%
 #   write_csv("gendata/sug_bev_decompos.csv")
 # sug_bev_decompos_per %>%
 #   write_csv("gendata/sug_bev_decompos_per.csv")
@@ -309,7 +313,7 @@ sug_bev_decompos %>%
 ggsave("figs/eda-3_decomposition.png",
        bg = "transparent",
        width = 200,                 # Ancho de la gráfica
-       height = 120,
+       height = 90,
        units = "mm",
        dpi = 300)
 
@@ -346,7 +350,7 @@ sug_bev_decompos_per %>%
 ggsave("figs/eda-3-2_decomposition_per.png",
        bg = "transparent",
        width = 200,                 # Ancho de la gráfica
-       height = 120,
+       height = 100,
        units = "mm",
        dpi = 300)
 
@@ -553,7 +557,7 @@ sug_bev_acf %>%
 ggsave("figs/eda-4_acf-pacf.png",
        bg = "transparent",
        width = 200,                 # Ancho de la gráfica
-       height = 120,
+       height = 80,
        units = "mm",
        dpi = 300)
 
@@ -594,7 +598,7 @@ sug_bev_acf_per %>%
 ggsave("figs/eda-4-2_acf-pacf-per.png",
        bg = "transparent",
        width = 200,                 # Ancho de la gráfica
-       height = 120,
+       height = 80,
        units = "mm",
        dpi = 300)
 
