@@ -47,12 +47,11 @@ bibliography: ../reference/ref.bib
 
 #' To install mytidyfunctions, you need 
 #' remotes::install_github("JavierMtzRdz/mytidyfunctions")
-
+if (!require("pacman")) install.packages("pacman")
+if (!require("mytidyfunctions")) remotes::install_github("JavierMtzRdz/mytidyfunctions")
 pacman::p_load(tidyverse, janitor, scales,
                mytidyfunctions, here, extrafont)
 
-## Specify locale ----
-Sys.setlocale("LC_ALL", "es_ES.UTF-8")
 
 ## Disable scientific notation ----
 options(scipen = 999)
@@ -67,7 +66,7 @@ options(ggplot2.discrete.colour = paletas_jmr$general,
         ggplot2.discrete.fill = paletas_jmr$general)
 
 # Load data ----
-sug_bev <- read_csv(here("rawdata/june1data.csv")) %>% 
+sug_bev <- read_csv(here("rawdata","june1data.csv")) %>% 
   clean_names() %>% 
   arrange(count) %>% 
   mutate(week_count = ifelse(is.na(lag(dof_w)) |
@@ -110,9 +109,7 @@ sug_bev_long <- sug_bev %>%
 
 # Introduction
 
-Zero-calorie beverages have been promoted as an alternative to sugary drinks to reduce the harmful effects of artificial sweeteners on consumers. The advised study investigates the impact of interventions, such as messaging and discounts, on the buying behaviour of zero-calorie and sugary drinks.The statistical advice for that study outlines how to quantitatively evaluate four research questions on this topic. The statistical questions to be answered include the following: 1) whether the interventions lead to increased consumption of zero-calorie beverages and decreased consumption of sugary beverages; 2) whether the effects vary across different sites; and 3) which of the combining interventions results in larger effects. <!--
-Javier: I removed the fourth question since it can be addressed in the first question.
--->
+Zero-calorie beverages have been promoted as an alternative to sugary drinks to reduce the harmful effects of artificial sweeteners on consumers. The advised study investigates the impact of interventions, such as messaging and discounts, on the buying behaviour of zero-calorie and sugary drinks.The statistical advice for that study outlines how to quantitatively evaluate four research questions on this topic. The statistical questions to be answered include the following: 1) whether the interventions lead to increased consumption of zero-calorie beverages and decreased consumption of sugary beverages; 2) whether the effects vary across different sites 3) whether messaging combined with discounts has a larger effect; and 4) which of the non-combined messaging interventions results in larger effects.
 
 # Data Description and Summaries
 
@@ -184,7 +181,7 @@ sug_bev_long %>%
 ```
 
 
-In particular, @fig-1 shows some important characteristics of the dataset. Firstly, the measurements for each site begins at different time points. Secondly, the third site shows a increase in sales during most of the first intervention, but afterwards, sales stay at a lower and more stable level. Thirdly, the  three calorie messaging interventions are in different order for each site. Lastly, a weekly seasonal effect can be noticed.
+In particular, @fig-1 shows some important characteristics of the dataset. Firstly, the measurements for each site begins at different time points. Secondly, the third site shows a increase in sales during most of the first intervention, but afterwards, sales stay at a lower and more stable level. Lastly, a weekly seasonal effect can be noticed.
 
 # Formal analysis
 
@@ -235,7 +232,6 @@ Poisson and Negative Binomial GLME models are suggested to analyze the effective
 # Appendix
 
 ::: {#appendix-count}
-## Detailed Explorarory Analysis {#sec-appeda}
 
 ```{=tex}
 \renewcommand\thefigure{A.\arabic{figure}}
