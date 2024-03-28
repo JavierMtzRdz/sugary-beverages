@@ -5,31 +5,60 @@ library(nlme)
 library(dplyr)
 library(knitr)
 library(tidyverse)
+library(ggstats)
 
 ### import data
 raw <- read.csv("rawdata/june1data.csv")
-sug_bev_trend <- read.csv("gendata/sug_bev_decompos.csv")
-data <- sug_bev_trend[,c('beverage','site','intervention','count','trend')]
 
-### restructure the data for LME
-## ZeroCal drinks
-zeroCal <- data[data$beverage=='Zero-calorie',]
+
+
+### restructure the data for GLME
 # delete NAs
-zeroCal <- zeroCal[!is.na(zeroCal$trend),]
-# use only the preint in the middle
-zeroCal <- zeroCal[zeroCal$count>21,]
-# remove washup and follow periods
-zeroCal <- zeroCal[!(zeroCal$intervention %in% c('wash','wash2','follow')),]
+raw <- raw[!is.na(raw$ZeroCal),]
+# remove washup periods
+raw <- raw[!(raw$Intervention %in% c('wash','wash2')),]
+# rename follow to preint
+raw$Intervention[raw$Intervention == 'follow'] <- 'preint'
 # make preint the reference
-zeroCal$intervention <- relevel(as.factor(zeroCal$intervention),ref = "preint")
+raw$Intervention <- relevel(as.factor(raw$Intervention),ref = "preint")
 # reset time for each period
-for (inte in unique(zeroCal$intervention)){
-  for (s in unique(zeroCal$site)){
-    idx = (zeroCal$intervention==inte)&(zeroCal$site==s)
-    zeroCal$count[idx] = zeroCal$count[idx] - min(zeroCal$count[idx])
+for (inte in unique(raw$Intervention)){
+  for (s in unique(raw$Site)){
+    idx = (raw$Intervention==inte)&(raw$Site==s)
+    raw$Count[idx] = raw$Count[idx] - min(raw$Count[idx])
   }
 }
+# adding weekend indicator
+raw$Weekend = raw$DofW > 5
 
+
+
+
+
+glm_zeroCal <- glm(ZeroCal ~ Intervention + Site + Weekend + offset(log(Total)), data = raw, family = poisson)
+summary(glm_zeroCal)
+
+glme_zeroCal <- glmer(ZeroCal ~ Intervention + (Intervention|Site) + offset(log(Total)), data = raw, family = poisson)
+summary(glme_zeroCal)
+
+
+glm_zeroCal <- list()
+Site_names <- unique(raw$Site)
+for (i in 1:3){
+  glm_zeroCal[[i]] <- glm(ZeroCal ~ Intervention + offset(log(Total)), data = raw[raw$Site==Site_names[i],], family = poisson)
+}
+
+summary(glm_zeroCal[[1]])
+summary(glm_zeroCal[[2]])
+summary(glm_zeroCal[[3]])
+
+
+modelplot(glm_zeroCal[[1]])
+
+
+
+glm_zeroCal <- glm(ZeroCal ~ Intervention + Site + Weekend + offset(log(Total)), data = raw, family = poisson)
+summary(glm_zeroCal)
 
 ## Sugary drinks
 sug <- data[data$beverage=='Sugary',]

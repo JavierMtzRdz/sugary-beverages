@@ -1,5 +1,5 @@
 ---
-title: "**STAT550 Homework No 2: Advice for Evaluating Interventions on Sugary and Zero-Calorie Beverage Consumption**"
+title: "**STAT550 Homework No 2: Statistical Advice on Investigating the impacts of Interventions on Sugary and Zero-Calorie Beverage Consumption**"
 author: Son Luu (71843379), Xihan Qian (54285556) and Javier Mtz.-Rdz. (94785938)
 pdf-engine: pdflatex
 align: left
@@ -7,6 +7,7 @@ date: "March 1, 2024"
 date-format: long
 number-sections: true
 number-depth: 4
+fig-dpi: 400
 editor: visual
 format: 
   pdf:
@@ -39,22 +40,92 @@ bibliography: ../reference/ref.bib
 \clearpage
 \pagenumbering{arabic}
 ```
+
+```{r preprocessing, include=FALSE}
+# Setup ----
+## Packages to use ----
+
+#' To install mytidyfunctions, you need 
+#' remotes::install_github("JavierMtzRdz/mytidyfunctions")
+
+pacman::p_load(tidyverse, janitor, scales,
+               mytidyfunctions, here, extrafont)
+
+## Specify locale ----
+Sys.setlocale("LC_ALL", "es_ES.UTF-8")
+
+## Disable scientific notation ----
+options(scipen = 999)
+
+## Load fonts ----
+loadfonts(quiet = TRUE)
+
+## Set theme ------
+theme_set(theme_jmr(text = element_text(family = "Times New Roman")))
+
+options(ggplot2.discrete.colour = paletas_jmr$general,
+        ggplot2.discrete.fill = paletas_jmr$general)
+
+# Load data ----
+sug_bev <- read_csv(here("rawdata/june1data.csv")) %>% 
+  clean_names() %>% 
+  arrange(count) %>% 
+  mutate(week_count = ifelse(is.na(lag(dof_w)) |
+                               !(lag(dof_w) == dof_w |
+                                   lag(dof_w) == dof_w - 1),
+                             1, 0),
+         week_count = cumsum(week_count),
+         date = as_date(count, # It does not match the dates very well.
+                        origin = "00-10-25 UTC"),
+         site = recode(site,
+                       "chop" = "Site A",
+                       "HF" = "Site B",
+                       "NS" = "Site C")) %>% 
+  arrange(site, count)
+
+# Long data
+sug_bev_long <- sug_bev %>% 
+  select(-c(juice100:total)) %>% 
+  pivot_longer(zero_cal:sugary,
+               names_to = "beverage",
+               values_to = "values") %>% 
+  mutate(beverage = recode(beverage,
+                           "zero_cal" = "Zero-calorie",
+                           "sugary" = "Sugary"),
+         intervention = recode(intervention,
+                               "wash" = "Washout",
+                               "wash2" = "Washout",
+                               "preint" = "Pre/pos-intervention",
+                               "follow" = "Pre/pos-intervention",
+                               "dis" = "Discount",
+                               "dismes" = "Discount +\nmessaging",
+                               "cal" = "Caloric content \nmessaging",
+                               "excer" = "Exercise equivalents \nmessaging",
+                               "both" = "Both \nmessages")) %>% 
+  left_join(sug_bev %>% select(count, site, total),
+            by = join_by(count, site)) %>% 
+  mutate(values_percent = values/total) 
+```
+
+
 # Introduction
 
-Zero-calorie beverages offer an alternative to sugary drinks that can help to avoid the harmful effects of artificial sweeteners. Therefore, it is important to understand what actions can motivate people to switch to these products. This study aims to assess the impact of messaging and discounts on the buying behaviour of zero-calorie and sugary drinks. The study’s statistical advice outlines how to quantitatively evaluate four research questions on this topic. The first question to be addressed is whether these interventions lead to increased consumption of zero-calorie beverages and decreased consumption of sugary beverages. Subsequently, the study will also investigate whether the effects vary across different sites (second question) and whether combining interventions results in larger effects (third question). Lastly, the study will compare the effectiveness of calorie-equivalent messaging with simple calorie admonishment (fourth question).
+Zero-calorie beverages have been promoted as an alternative to sugary drinks to reduce the harmful effects of artificial sweeteners on consumers. The advised study investigates the impact of interventions, such as messaging and discounts, on the buying behaviour of zero-calorie and sugary drinks.The statistical advice for that study outlines how to quantitatively evaluate four research questions on this topic. The statistical questions to be answered include the following: 1) whether the interventions lead to increased consumption of zero-calorie beverages and decreased consumption of sugary beverages; 2) whether the effects vary across different sites; and 3) which of the combining interventions results in larger effects. <!--
+Javier: I removed the fourth question since it can be addressed in the first question.
+-->
 
 # Data Description and Summaries
 
-To evaluate the effects of interventions, the study gathered data on beverages sold at four cafeterias and three convenience stores across three sites. The dataset recorded daily sales of these beverages for a period of 221 days and summarizes the data by site. Nevertheless, the observations for each site start on different dates: site A starts on day 1, site B on day 14, and site C on day 20.[^1] In total, there are 631 observations in the dataset.
+To evaluate the effects of interventions, the study gathered data on beverages sold at four cafeterias and three convenience stores across three sites. Daily sales of these beverages were recorded for a period of 221 days and summarizes by site. The starting date of observations for each site varied: site A on day 1, site B on day 14, and site C on day 20.[^1] In total, there are 631 observations in the dataset.
 
-[^1]: We are using the client's submission names for sites, but they may not correspond to the same sites in the submission. Here, A corresponds to chop, B to NF and C to NS.
+[^1]: In this report, Site A corresponds to chop in the dataset, Site B to NF and Site C to NS. 
 
-The dataset includes variables related to time, sales, site and intervention. The time variables are the count of days since the start of the study and the day of the week. The sales variables include zero-calorie, sugary, 100% juice, orange juice, sports and total beverages sold, but only zero-calorie and sugary beverages are considered for this analysis. As for site and intervention, there is a variable for each one. @tbl-vars summarizes the variables available in the dataset, their classification, and how they are measured.
+The dataset includes variables related to time, sales, site, and intervention. The time variables are the count of days since the start of the study and the day of the week. The sales variables include zero-calorie, sugary, 100% juice, orange juice, sports, and total beverages sold, but only zero-calorie and sugary beverages are considered for this analysis. Each site and intervention has a variable. @tbl-vars summarizes the variables  in the dataset, including they are classified and measured.
 
 |          Variable           |    Type     |
 |:---------------------------:|:-----------:|
-| Day of the quasi-experiment | Continuous  |
-|       Day of the week       | Continuous  |
+| Day of the quasi-experiment | Ordinal     |
+|       Day of the week       | Categorical |
 |            Site             | Categorical |
 |        Intervention         | Categorical |
 |    Sugary beverages sold    | Continuous  |
@@ -63,15 +134,57 @@ The dataset includes variables related to time, sales, site and intervention. Th
 
 : **Description of variables** {#tbl-vars tbl-colwidths="\[35,25\]"}
 
-In addition to the periods that were not recorded at the beginning of the study in sites B and C, there are nine missing values for sales of zero-calorie and sugary beverages. The missing observations correspond to the last week of site B and two days of site C. Aside from the missing information at the beginning and end of the study, the other missing values are unrelated to any specific factor. Furthermore, the sales data for other beverages and the total amount have several missing values, but they do not affect this analysis.
+In addition to the periods that were not recorded at the beginning of the study in sites B and C, there are nine missing values for sales of zero-calorie and sugary beverages. The missing observations are from the last week of site B and two days of site C. Aside from the missing information at the beginning and end of the study, the other missing values are unrelated to any specific factor. Furthermore, the sales data for other beverages and the total number of sales have several missing values, but they do not affect this analysis.
 
 # Exploratory Analysis
 
 Given that the data consists of a time series of sales across three sites, it was necessary to carry out a time-based analysis. In that sense, @fig-1 helps visualize the beverages sold and the shadows behind the lines display the distinct intervention periods by site. Additionally, @sec-appeda summarizes the effect from past observations in the new data points and the decomposition of sugary and zero-calorie sales series in the change by the mean level (trend), the periodicity of the data (seasonal variation) and factors that do not show a pattern (random variation).
 
-![**Sale of sugary and zero-calorie drinks by intervention**](../figs/eda-1_time-serie.png){#fig-1}
+```{r}
+#| label: fig-1
+#| fig-cap: "**Sale of sugary and zero-calorie drinks by intervention**"
+#| echo: false
+#| warning: false
+#| fig-width: 7
+#| fig-height: 4.5
+#| out-width: 180mm
+#| out-height: 110mm
 
-In particular, @fig-1 shows some important characteristics of the dataset. Firstly, the measurements for each site began at different times. Secondly, the third site experienced a significant increase in sales during most of the first intervention, but afterwards, sales remained at a lower and more stable level. Thirdly, the order of the three calorie messaging interventions was different for each site. Lastly, it is evident from the data that there is a weekly seasonal effect.
+
+sug_bev_long %>% 
+  ggplot(aes(x = count, 
+             y = values, 
+             group = beverage,
+             color = beverage)) +
+  geom_col(aes(y = Inf,
+               fill = fct_inorder(intervention)),
+           color = NA,
+           width = 1,
+           alpha = 0.25) +
+  facet_wrap(~site,
+             scales = "free_y",
+             ncol = 1) +
+  geom_line() +
+  scale_x_continuous(expand = expansion(mult = c(0.0, 0.0))) +
+  scale_color_jmr(palette = "general",
+                  guide = guide_legend(
+    nrow = 2,
+    direction = "horizontal",
+    title.position = "top")) +
+  scale_fill_jmr(palette = "multiple",
+                 guide = guide_legend(
+    direction = "horizontal",
+    title.position = "top")) +
+  labs(colour = "Beverage",
+       fill = "Intervention periods",
+       x = "Days since the start of the study",
+       y = "Sold beverages") +
+  theme(legend.spacing = unit(0.5, "cm"),
+        legend.key.height = unit(0.7, "cm"))
+```
+
+
+In particular, @fig-1 shows some important characteristics of the dataset. Firstly, the measurements for each site begins at different time points. Secondly, the third site shows a increase in sales during most of the first intervention, but afterwards, sales stay at a lower and more stable level. Thirdly, the  three calorie messaging interventions are in different order for each site. Lastly, a weekly seasonal effect can be noticed.
 
 # Formal analysis
 
@@ -79,11 +192,8 @@ To evaluate the research questions, it is suggested to utilize a preparation ste
 
 ## Pre-analysis
 
-Before conducting the statistical analysis, it is important to address some elements that were identified during the Exploratory Analysis that could impact the results. These include the weekly effect, different lengths of the pre-intervention observations and unnecessary information. To focus on capturing the intervention effects instead of the number of days effects, one can eliminate the weekly impact by either using a percentage of sales or decomposing the time series, as suggested by @ChatfieldXing:2019. While the percentage approach may be easier, it is recommended to use the decomposition method as the variable containing the total items sold may have inconsistencies that suggest unreliable information.[^2]
+Before conducting the statistical analysis, it is important to address some elements that are identified in  the Exploratory Analysis that may impact the results. These different lengths of the pre-intervention observations and unnecessary information. As sites B and C have a short pre-intervention period, it is necessary to compensate for the missing information. This can be done by combining the follow-up and pre-intervention categories into a new category that will serve as the baseline for the study. Lastly, we are not interested in the washout periods to reduce the effects of previous interventions, so such data can be ignored.
 
-[^2]: For example, day 199 in the C site has more zero-calorie and sugary beverages sold than total items. Also, days 50 to 53, 107, 184 and 196 in the same site have decimals.
-
-As sites B and C have a short pre-intervention period, it is necessary to compensate for the missing information. This can be done by combining the follow-up and pre-intervention categories into a new category that will serve as the baseline for the study. Lastly, we are not interested in the washout periods that are used to reduce the effects of previous interventions. Hence, this data can be ignored.
 
 ## ANOVA/ANCOVA
 
@@ -91,40 +201,38 @@ Analysis of Variance (ANOVA) is a statistical method used to compare the means o
 
 However, ANOVA's limitation lies in its inability to account for external variables that could influence outcomes, such as baseline consumption patterns or hospital site characteristics. Despite this, ANOVA remains valuable for initial analysis, with its limitations highlighting the need for a comprehensive approach, possibly incorporating Analysis of Covariance (ANCOVA), to fully understand the interventions’ impacts on beverage selection.
 
-## Linear Mixed-Effect Model
+## Generalized Linear Mixed-Effect Model
 
-Linear Mixed-Effects (LME) model is a statistical model that accounts for fixed effects, common trends that are present at all levels of the data, as well as random effects, correlation within groups and variation between groups. The inclusion of random effects makes LME especially adept at handling hierarchical and longitudinal data, where observations are grouped into different levels. In these models, we assume that the errors (or the differences between the predicted value and the actual value) are random and follow a normal distribution with an average of zero. 
+Generalized Linear Mixed-Effects (GLME) model is a statistical model that accounts for fixed effects, common trends that are present at all levels of the data, and random effects, group-specific error terms that quantify correlation within groups and variation between groups. The inclusion of random effects makes GLME especially adept at handling hierarchical and longitudinal data, where observations are grouped into different levels. 
 
-## Recommendation
+In addition, GLME models can accommodate non-normal responses using different link functions to control the relationship between the response mean and the other variables. In these models, we control the variance of the response by assuming the response follows a specific distribution. For this study, we use the log link function and Poisson or Negative Binomial regression family due to the response being count data. 
 
-For the first and second questions, we recommend using the following ANOVA model 
-$$\text{Sales} = \beta_0+\beta_1\times\text{Intervention}+\beta_2\times\text{Site}$$ 
-with the pre-intervention period being the reference. For the third question, we recommend using the following ANOVA model 
-$$\text{Sales} = \beta_0+\beta_1\times\text{Calorie } +\beta_2\times\text{Exercise}$$
+
+## Recommendations
+
+
+For the first question regarding the effects of each intervention, we recommend the following GLM model 
+$$\log(\text{Sales}) = \beta_0+\beta_1\times\text{Intervention} + \log(\text{Total Sales})$$ 
+with the control period being the reference and the total sales as the offset. Both the pre-intervention and follow-up periods are considered as the control period in this case. For the second question regarding the difference in intervention effects between sites, we recommend the same model as the first question with the addition of the interaction term between intervention and site. For the third question comparing individual interventions against their combination, we recommend the following GLM model 
+$$\log(\text{Sales}) = \beta_0+\beta_1\times\text{Calorie} +\beta_2\times\text{Exercise} + \log(\text{Total Sales})$$
 with the combination period being the reference. If the interest is also the effect of combining discount and messaging, then the following model is recommended 
-$$\text{Sales} = \beta_0+\beta_1\times\text{Discount }$$ 
-with the discount plus messaging as the reference. For the final question, we recommend using the following ANOVA model 
-$$\text{Sales} = \beta_0+\beta_1\times\text{Calorie}$$
+$$\log(\text{Sales}) = \beta_0+\beta_1\times\text{Discount} + \log(\text{Total Sales})$$ 
+with the discount plus messaging as the reference. For the final question comparing the effects of calorie messaging and simple calorie admonishment, we recommend the following GLM model 
+$$\log(\text{Sales}) = \beta_0+\beta_1\times\text{Calorie} + \log(\text{Total Sales})$$
 with the calorie admonishment period being the reference. 
 
-In the model for the second question, we recommend first running a preliminary ANOVA for each of the interventions and the pre-intervention period. If there are significant differences in estimated coefficients between interventions, a LME model with intervention-dependent random effects is recommended. A similar strategy needs to be applied to the other questions. Still, the preliminary ANOVA is performed for each site and site-dependent random effects are added when differences are significant. The reason for these preliminary analyses is to determine if LME is necessary or not. Note that the sales in these models refer to the trend extracted in the Pre-analysis step. After the models are fitted, the residuals need to be visualized via scatter plot, autocorrelation plot and QQ-plot to confirm independent, equal variance and normal error assumptions for both ANOVA and LME.
-
-If the sales trends are found to be linear for each intervention period, the time covariate can be added to the models above, turning them into ANCOVA models. In this case, only the pre-intervention period before the third intervention should be kept for the analysis as the time covariate needs to be reset for each intervention period as well as the pre-intervention period.
+In the model for the second question, we recommend first running a preliminary GLM for each of the interventions and the pre-intervention period. If there are significant differences in estimated coefficients between interventions, a GLME model with intervention-dependent random effects is recommended. A similar strategy is recommended for the other questions where the preliminary GLM is performed for each site and site-dependent random effects are added when differences in estimated coefficients between sites are significant. The reason for these preliminary analyses is to determine if GLME is necessary or not. After the models are fitted, the residuals need to be visualized via scatter plot, autocorrelation plot and QQ-plot to confirm independent, equal variance and normal error assumptions for both GLM and GLME. For hypothesis testing and interpretation, Bonferroni correction is applied to the significance level (i.e. divide the significance level by the number of hypothese) to counter false rejection. For model diagnostics, we recommend using QQ-plots to confirm the distributional assumption and scatter plot of the residuals for the independent error assumption.
 
 # Conclusion
 
-The study employs ANOVA/ANCOVA and LME models to analyze the effectiveness of interventions on beverage sales across hospitals, addressing four research questions. Preliminary ANOVA models are used to identify differences in intervention and site effects. LME models are recommended for deeper analysis when significant variations are observed, while ANOVA models are suggested for other cases. This approach ensures a thorough investigation into how each intervention influences beverage choices, the impact of site characteristics and the effectiveness of calorie information and exercise prompts. The study's methodology provides a clear path to understanding which interventions work best, promoting healthier beverage consumption.
+Poisson and Negative Binomial GLME models are suggested to analyze the effectiveness of interventions on beverage sales across hospitals, addressing four research questions. Preliminary GLM models are used to identify differences between intervention and site effects. GLME models are recommended for formal analysis when significant variations are observed, and GLM models are suggested otherwise. This approach ensures a thorough investigation into how each intervention influences beverage choices, the impact of site characteristics and the effectiveness of calorie information and exercise prompts. The methodology recommended would provide a clear path to understanding which interventions work best in promoting healthier beverage consumption.
+
 
 \newpage
 
-# References
+\appendix
 
-::: {#refs}
-:::
-
-\newpage
-
-# Appendices
+# Appendix
 
 ::: {#appendix-count}
 ## Detailed Explorarory Analysis {#sec-appeda}
@@ -133,7 +241,11 @@ The study employs ANOVA/ANCOVA and LME models to analyze the effectiveness of in
 \renewcommand\thefigure{A.\arabic{figure}}
 \setcounter{figure}{0}
 ```
-![**ACF and PACF by Beverage and Site**](../figs/eda-4_acf-pacf.png){#fig-2}
 
-![**Decomposition Analysis of Sales for Sugary and Zero-Calorie Beverages**](../figs/eda-3_decomposition.png){#fig-3}
+
+## Preliminary GLM
+
+## Formal analysis
+
+
 :::
