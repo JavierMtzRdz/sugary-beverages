@@ -2,7 +2,7 @@ setwd("../rawdata")
 df <- read.csv("june1data.csv")
 
 library(tidyverse)
-
+## Remove the washout periods and set followup as preint
 df = mutate(df,
             Intervention = recode(Intervention,
                                   "follow" = "preint"),
@@ -11,6 +11,7 @@ df = mutate(df,
 
 df$Intervention = relevel(as.factor(df$Intervention),ref = "preint")
 
+## Plotting CI's to see if random slopes and intercepts are needed
 library(lme4)
 df_chop = subset(df, Site == "chop")
 df_HF = subset(df, Site == "HF")
@@ -26,19 +27,23 @@ models <- list("chop" = glm0,
 library(ggstats)
 ggcoef_compare(models, intercept = T)
 
-glmm_zerocal1=glmer(ZeroCal~Intervention+(Intervention+1|Site)+offset(log(Total2)), data = df, family=poisson)
+## Q1
+glmm_zerocal1=glmer(ZeroCal~Intervention+(Intervention+1|Site)+offset(log(Total)), data = df, family=poisson)
 summary(glmm_zerocal)
 
-glmm_sugary1=glmer(Sugary~Intervention+(Intervention+1|Site)+offset(log(Total2)), data = df, family=poisson)
+glmm_sugary1=glmer(Sugary~Intervention+(Intervention+1|Site)+offset(log(Total)), data = df, family=poisson)
 summary(glmm_sugary)
 
+## Q2
 glmm_zerocal2=glmer(ZeroCal~Site*Intervention+(Intervention+1|Site)+offset(log(Total)), data = df, family=poisson)
 summary(glmm_zerocal2)
 
+## Q3
 df$Intervention = relevel(as.factor(df$Intervention),ref = "both")
 glmm_zerocal_comb3 = glmer(ZeroCal~Intervention+(Intervention+1|Site)+offset(log(Total)), data = df, family=poisson)
 summary(glmm_zerocal_comb3)
 
+## Q4
 df$Intervention = relevel(as.factor(df$Intervention),ref = "cal")
 glmm_zerocal4 = glmer(ZeroCal~Intervention+(Intervention+1|Site)+offset(log(Total)), data = df, family=poisson)
 summary(glmm_zerocal4)
