@@ -60,10 +60,10 @@ options(scipen = 999)
 loadfonts(quiet = TRUE)
 
 ## Set theme ------
-theme_set(theme_jmr(text = element_text(family = "Times New Roman")))
-
-options(ggplot2.discrete.colour = paletas_jmr$general,
-        ggplot2.discrete.fill = paletas_jmr$general)
+# theme_set(theme_jmr(text = element_text(family = "Times New Roman")))
+# 
+# options(ggplot2.discrete.colour = paletas_jmr$general,
+#         ggplot2.discrete.fill = paletas_jmr$general)
 
 # Load data ----
 sug_bev <- read_csv(here("rawdata/june1data.csv")) %>% 
@@ -164,15 +164,15 @@ sug_bev_long %>%
              ncol = 1) +
   geom_line() +
   scale_x_continuous(expand = expansion(mult = c(0.0, 0.0))) +
-  scale_color_jmr(palette = "general",
-                  guide = guide_legend(
-    nrow = 2,
-    direction = "horizontal",
-    title.position = "top")) +
-  scale_fill_jmr(palette = "multiple",
-                 guide = guide_legend(
-    direction = "horizontal",
-    title.position = "top")) +
+  # scale_color_jmr(palette = "general",
+  #                 guide = guide_legend(
+  #   nrow = 2,
+  #   direction = "horizontal",
+  #   title.position = "top")) +
+  # scale_fill_jmr(palette = "multiple",
+  #                guide = guide_legend(
+  #   direction = "horizontal",
+  #   title.position = "top")) +
   labs(colour = "Beverage",
        fill = "Intervention periods",
        x = "Days since the start of the study",
@@ -191,11 +191,11 @@ To evaluate the research questions, it is suggested to utilize a preparation ste
 
 Before conducting the statistical analysis, it is important to address some elements that are identified in the Exploratory Analysis that may impact the results. These different lengths of the pre-intervention observations and unnecessary information. As sites B and C have a short pre-intervention period, it is necessary to compensate for the missing information. This can be done by combining the follow-up and pre-intervention categories into a new category that will serve as the baseline for the study. Lastly, we are not interested in the washout periods to reduce the effects of previous interventions, so such data can be ignored.
 
-## Generalized Linear Mixed-Effect Model
+## Generalized Linear Models
 
-Generalized Linear Mixed-Effects (GLME) model is a statistical model that accounts for fixed effects, common trends that are present at all levels of the data, and random effects, group-specific error terms that quantify correlation within groups and variation between groups. The inclusion of random effects makes GLME especially adept at handling hierarchical and longitudinal data, where observations are grouped into different levels.
+Generalized Linear Models (GLM) expand traditional linear regression to accommodate various data types, including those that don't fit the normal distribution mold. GLM uses link functions to connect predictors to the response variable in a way that's appropriate for the data's distribution. This approach is especially useful for analyzing count data, which count occurrences of events and often don't align with linear regression assumptions.
 
-In addition, GLME models can accommodate non-normal responses using different link functions to control the relationship between the response mean and the other variables. In these models, we control the variance of the response by assuming the response follows a specific distribution. For this study, we use the log link function and Poisson or Negative Binomial regression family due to the response being count data.
+For count data, GLM commonly employs the Poisson and Negative Binomial distributions. The Poisson distribution fits count data assuming events occur independently at a constant rate, suitable for evenly distributed counts. When counts exhibit more variability than Poisson can handle, the Negative Binomial distribution steps in. It offers an additional parameter to better model data with variance exceeding the mean, making it a flexible choice for analyzing count data within the GLM framework.
 
 ## Generalized Linear Mixed-Effect Model
 
