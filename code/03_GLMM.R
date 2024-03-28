@@ -1,9 +1,14 @@
-setwd("../rawdata")
-# read data
-df <- read.csv("june1data.csv")
-
-# import libraries
+# Import libraries
 library(tidyverse)
+library(DHARMa)
+library(lme4)
+library(ggstats)
+library(performance)
+library(glmmTMB)
+library(here)
+
+# Read data
+df <- read.csv(here("rawdata", "june1data.csv"))
 
 ## Remove the washout periods and set followup as preint
 
