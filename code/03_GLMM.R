@@ -1,17 +1,17 @@
-setwd("../rawdata")
-# read data
-df <- read.csv("june1data.csv")
-
-# import libraries
+# Import libraries
 library(tidyverse)
 library(DHARMa)
 library(lme4)
 library(ggstats)
 library(performance)
 library(glmmTMB)
+library(here)
 
+# Read data
+df <- read.csv(here("rawdata", "june1data.csv"))
 
-# reformat data
+## Remove the washout periods and set followup as preint
+
 df = mutate(df,
             Intervention = recode(Intervention,
                                   "follow" = "preint"), # set all control periods to preint
@@ -21,7 +21,10 @@ df = mutate(df,
 # set preint as baseline
 df$Intervention = relevel(as.factor(df$Intervention),ref = "preint") 
 
+
+## Plotting CI's to see if random slopes and intercepts are needed
 # get site-specific and intervention-specific data
+
 df_chop = subset(df, Site == "chop")
 df_HF = subset(df, Site == "HF")
 df_NS = subset(df, Site == "NS")
@@ -91,6 +94,20 @@ ggcoef_compare(models, intercept = T)
 
 
 
+
+
+## Q1
+glmm_zerocal1=glmer(ZeroCal~Intervention+(Intervention+1|Site)+offset(log(Total)), data = df, family=poisson)
+summary(glmm_zerocal)
+
+glmm_sugary1=glmer(Sugary~Intervention+(Intervention+1|Site)+offset(log(Total)), data = df, family=poisson)
+summary(glmm_sugary)
+
+## Q2
+glmm_zerocal2=glmer(ZeroCal~Site*Intervention+(Intervention+1|Site)+offset(log(Total)), data = df, family=poisson)
+summary(glmm_zerocal2)
+
+## Q3
 
 ## Test effectiveness of interventions ####
 df$Intervention = relevel(as.factor(df$Intervention),ref = "preint")
@@ -167,6 +184,7 @@ plot(simulateResiduals(glmm_sugary_HF))
 #   dismes_NS > dismes_chop,HF
 
 ## Effectiveness of both compared to cal and excer ####
+
 df$Intervention = relevel(as.factor(df$Intervention),ref = "both")
 # zeroCal
 glmm_zerocal_both=glmmTMB(ZeroCal~Intervention + (0+Site|Intervention) + offset(log(Total)), data = df, family=nbinom2)
@@ -174,6 +192,9 @@ summary(glmm_zerocal_both)
 
 check_overdispersion(glmm_zerocal_both)
 plot(simulateResiduals(glmm_zerocal_both))
+
+
+## Q4
 
 # sugary
 glmm_sugary_both=glmmTMB(Sugary~Intervention + (0+Site|Intervention) + offset(log(Total)), data = df, family=nbinom2)
@@ -205,6 +226,7 @@ plot(simulateResiduals(glmm_sugary_dis))
 
 
 ## Effectiveness of cal compared to excer ####
+
 df$Intervention = relevel(as.factor(df$Intervention),ref = "cal")
 # zeroCal
 glmm_zerocal_cal=glmmTMB(ZeroCal~Intervention + (0+Site|Intervention) + offset(log(Total)), data = df, family=nbinom2)
