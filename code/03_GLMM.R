@@ -112,6 +112,13 @@ summary(glmm_zerocal2)
 ## Test effectiveness of interventions ####
 df$Intervention = relevel(as.factor(df$Intervention),ref = "preint")
 # zeroCal
+# poisson
+glmm_zerocal=glmmTMB(ZeroCal~Intervention + (0+Site|Intervention) + offset(log(Total)), data = df, family=poisson)
+summary(glmm_zerocal)
+
+check_overdispersion(glmm_zerocal)
+plot(simulateResiduals(glmm_zerocal))
+# negative binomial
 glmm_zerocal=glmmTMB(ZeroCal~Intervention + (0+Site|Intervention) + offset(log(Total)), data = df, family=nbinom2)
 summary(glmm_zerocal)
 
@@ -131,14 +138,6 @@ plot(simulateResiduals(glmm_sugary))
 # chop baseline
 df$Site = relevel(as.factor(df$Site),ref = "chop")
 # zeroCal
-# poisson
-glmm_zerocal_chop=glmmTMB(ZeroCal~Intervention*Site + (0+Site|Intervention) + offset(log(Total)), data = df, family=poisson)
-summary(glmm_zerocal_chop)
-
-check_overdispersion(glmm_zerocal_chop)
-plot(simulateResiduals(glmm_zerocal_chop))
-# => overdispersion detected + terrible KS test
-# negative binomial
 glmm_zerocal_chop=glmmTMB(ZeroCal~Intervention*Site + (0+Site|Intervention) + offset(log(Total)), data = df, family=nbinom2)
 summary(glmm_zerocal_chop)
 

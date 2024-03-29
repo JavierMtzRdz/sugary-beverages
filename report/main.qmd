@@ -195,17 +195,15 @@ To evaluate the research questions, it is suggested to utilize a preparation ste
 Before conducting the statistical analysis, it is important to address some elements that are identified in  the Exploratory Analysis that may impact the results. These different lengths of the pre-intervention observations and unnecessary information. As sites B and C have a short pre-intervention period, it is necessary to compensate for the missing information. This can be done by combining the follow-up and pre-intervention categories into a new category that will serve as the baseline for the study. Lastly, we are not interested in the washout periods to reduce the effects of previous interventions, so such data can be ignored.
 
 
-## ANOVA/ANCOVA
+## Generalized Linear Models
 
-Analysis of Variance (ANOVA) is a statistical method used to compare the means of three or more samples, determining if at least one sample mean significantly differs from the others. It's instrumental in experiments aimed at evaluating the effectiveness of different interventions. In this study, it is used to encourage the selection of zero-calorie beverages over sugary options in hospital settings. By examining the variance within and between intervention groups, ANOVA facilitates understanding whether observed differences in beverage consumption are attributable to the interventions or occur by chance.
+Generalized Linear Models (GLM) expand traditional linear regression to accommodate various data types, including those that don't fit the normal distribution mold. GLM uses link functions to connect predictors to the response variable in a way that's appropriate for the data's distribution. This approach is especially useful for analyzing count data, which count occurrences of events and often don't align with linear regression assumptions.
 
-However, ANOVA's limitation lies in its inability to account for external variables that could influence outcomes, such as baseline consumption patterns or hospital site characteristics. Despite this, ANOVA remains valuable for initial analysis, with its limitations highlighting the need for a comprehensive approach, possibly incorporating Analysis of Covariance (ANCOVA), to fully understand the interventions’ impacts on beverage selection.
+For count data, GLM commonly employs the Poisson and Negative Binomial distributions. The Poisson distribution fits count data assuming events occur independently at a constant rate, suitable for evenly distributed counts. When counts exhibit more variability than Poisson can handle, the Negative Binomial distribution steps in. It offers an additional parameter to better model data with variance exceeding the mean, making it a flexible choice for analyzing count data within the GLM framework. In addition to the distributional assumption, GLM assumes that the error terms are independent.
 
 ## Generalized Linear Mixed-Effect Model
 
-Generalized Linear Mixed-Effects (GLME) model is a statistical model that accounts for fixed effects, common trends that are present at all levels of the data, and random effects, group-specific error terms that quantify correlation within groups and variation between groups. The inclusion of random effects makes GLME especially adept at handling hierarchical and longitudinal data, where observations are grouped into different levels. 
-
-In addition, GLME models can accommodate non-normal responses using different link functions to control the relationship between the response mean and the other variables. In these models, we control the variance of the response by assuming the response follows a specific distribution. For this study, we use the log link function and Poisson or Negative Binomial regression family due to the response being count data. 
+Generalized Linear Mixed-Effects (GLME) model is a statistical model that accounts for fixed effects, common trends that are present at all levels of the data, and random effects, group-specific error terms that quantify correlation within groups and variation between groups. The inclusion of random effects makes GLME especially adept at handling hierarchical and longitudinal data, where observations are grouped into different levels. Besides the additional random effects, GLME models have the same distributional and error assumptions as GLM.
 
 
 ## Recommendations
@@ -244,8 +242,37 @@ Poisson and Negative Binomial GLME models are suggested to analyze the effective
 
 
 ## Preliminary GLM
+In the preliminary analysis examining the efficacy of interventions designed to encourage the consumption of zero-calorie beverages, we are particularly interested in understanding how these interventions perform across different hospital sites. To make informed decisions about our model structure, specifically whether to include random slopes or random intercepts, we generate plots that visualize the effects of interventions across the sites.
+
+With only three sites in our study, incorporating random effects is not advisable due to the limited data available. A small number of groups can lead to overfitting and unreliable estimates of variability. Therefore, despite variations in the preliminary analysis, we will not include random effects for sites, keeping our model straightforward against the challenges of a small sample size.
+
+Now we proceed to determine if intervention-specific random effect is needed. By using 'ggcoef_compare', we are able to produce plots that display the confidence intervals for the incidence rate ratios (IRR) of each intervention, broken down by site. These plots are a powerful diagnostic tool—they help us to visually inspect if there is a notable variation in the effects of interventions within the different hospital sites. With the plot containing both intercept and slope, we will be able to determine whether we need random intercept or slope based on the variability.
+
+```{r}
+#| echo: false
+#| eval: true 
+#| warning: false
+#| file: ../code/03_GLMM_randint.R
+```
+
+From the plot provided relating to consumption of zero-calorie beverages, we see that The confidence intervals within each site demonstrate variation in the effect sizes of the interventions. This pattern suggests substantial heterogeneity in the treatment effects within sites, indicating that the inclusion of random slopes for the interventions would be appropriate to model this within-site variation. Conversely, the relatively consistent placement of the confidence interval centers across the different sites argues against the need for random intercepts, as it implies little variation in the baseline effects between sites. Thus, a mixed-effects model with random slopes for interventions would be a good choice. A comparable plot can be produced to examine the consumption of sugary beverages, which similarly indicates the necessity of incorporating random slopes into the model to account for the variability in effects.
+
 
 ## Formal analysis
+For the first question regarding the effects of each intervention, there is a significant increase in zero-calorie beverage sales when discount plus messaging is implemented and no similar increase in sugary beverage sales. Other interventions have no significant effect. This suggests discount plus messaging is effective at encouraging people to buy zero-calorie beverages.
+
+For the second question regarding the difference in intervention effects between sites, the results are summarized in Table //insert table of results for question 2//. It is interesting to note that discount plus messaging has significantly different effect across sites for both zero-calorie and sugary beverages.
+
+//insert table of results for question 2//
+
+For the third question comparing individual interventions against their combination, using both calorie messaging and calorie admonishment is not significantly different from implementing them individually. But discount plus messaging does improve sales for zero-calorie beverages compare to discount only.
+
+For the final question comparing the effects of calorie messaging and simple calorie admonishment, there are no significant results for both zero-calorie and sugary beverages.
+
+In addition, poisson GLME models exhibit overdispersion for this data (mean being less than variance). Therefore, the results above are obtained using negative binomial GLME, which eliminates overdispersion. In addition, negative binomial models have better QQ plots, which is illustrated in @fig-pois and @fig-nb.
 
 
+![**QQ and residual scatter plots for poisson GLME model of first question**](../figs/QQ_pois.png){#fig-pois}
+![**QQ and residual scatter plots for negative binomial GLME model of first question**](../figs/QQ_nb.png){#fig-nb}
 :::
+
