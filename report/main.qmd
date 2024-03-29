@@ -123,9 +123,9 @@ The dataset includes variables related to time, sales, site, and intervention. T
 |       Day of the week       | Categorical |
 |            Site             | Categorical |
 |        Intervention         | Categorical |
-|    Sugary beverages sold    | Continuous  |
-| Zero-calorie beverages sold | Continuous  |
-|    Other beverages sold     | Continuous  |
+|    Sugary beverages sold    |  Discrete   |
+| Zero-calorie beverages sold |  Discrete   |
+|    Other beverages sold     |  Discrete   |
 
 : **Description of variables** {#tbl-vars tbl-colwidths="\[35,25\]"}
 
@@ -133,7 +133,7 @@ In addition to the periods that were not recorded at the beginning of the study 
 
 # Exploratory Analysis
 
-Given that the data consists of a time series of sales across three sites, it was necessary to carry out a time-based analysis. In that sense, @fig-1 helps visualize the beverages sold and the shadows behind the lines display the distinct intervention periods by site. Additionally, @sec-appeda summarizes the effect from past observations in the new data points and the decomposition of sugary and zero-calorie sales series in the change by the mean level (trend), the periodicity of the data (seasonal variation) and factors that do not show a pattern (random variation).
+Given that the data consists of a time series of sales across three sites, it was necessary to carry out a time-based analysis. In that sense, @fig-1 helps visualize the beverages sold and the shadows behind the lines display the distinct intervention periods by site. In particular, it shows some important characteristics of the dataset. Firstly, the measurements for each site begins at different time points. Secondly, the third site shows a increase in sales during most of the first intervention, but afterwards, sales stay at a lower and more stable level. Lastly, a weekly seasonal effect can be noticed.
 
 ```{r}
 #| label: fig-1
@@ -178,12 +178,10 @@ sug_bev_long %>%
         legend.key.height = unit(0.7, "cm"))
 ```
 
-In particular, @fig-1 shows some important characteristics of the dataset. Firstly, the measurements for each site begins at different time points. Secondly, the third site shows a increase in sales during most of the first intervention, but afterwards, sales stay at a lower and more stable level. Lastly, a weekly seasonal effect can be noticed.
-
 
 # Formal analysis
 
-To evaluate the research questions, it is suggested to utilize a preparation step along with two statistical methods. In the following subsections, the necessary data adjustments, a detailed explanation of each recommended model and the suggested procedure to conduct and analyze the results are presented.
+A preparation step to address some elements that are identified in the Exploratory Analysis along with two statistical methods, Generalized Linear Models (GLM) and Generalized Linear Mixed-Effect Model (GLME), are suggested for the formal analysis of the data. In the following subsections, the necessary data adjustments, a detailed explanation of each recommended model and the suggested procedure to conduct and analyze the results are presented.
 
 ## Pre-analysis
 
@@ -191,13 +189,13 @@ Before conducting the statistical analysis, it is important to address some elem
 
 ## Generalized Linear Models
 
-Generalized Linear Models (GLM) expand traditional linear regression to accommodate various data types, including those that don't fit the normal distribution mold. GLM uses link functions to connect predictors to the response variable in a way that's appropriate for the data's distribution. This approach is especially useful for analyzing count data, which count occurrences of events and often don't align with linear regression assumptions.
+Generalized Linear Models expand traditional linear regression to accommodate various data types, including those that don't fit the normal distribution mold. GLM uses link functions to connect predictors to the response variable in a way that is suitable for the distribution of the data. This approach is especially useful for analyzing count data, which count occurrences of events and often do not align with linear regression assumptions.
 
 For count data, GLM commonly employs the Poisson and Negative Binomial distributions. The Poisson distribution fits count data assuming events occur independently at a constant rate, suitable for evenly distributed counts. When counts exhibit more variability than Poisson can handle, the Negative Binomial distribution steps in. It offers an additional parameter to better model data with variance exceeding the mean, making it a flexible choice for analyzing count data within the GLM framework. In addition to the distributional assumption, GLM assumes that the error terms are independent.
 
 ## Generalized Linear Mixed-Effect Model
 
-Generalized Linear Mixed-Effects (GLME) model is a statistical model that accounts for fixed effects, common trends that are present at all levels of the data, and random effects, group-specific error terms that quantify correlation within groups and variation between groups. The inclusion of random effects makes GLME especially adept at handling hierarchical and longitudinal data, where observations are grouped into different levels. Besides the additional random effects, GLME models have the same distributional and error assumptions as GLM.
+Generalized Linear Mixed-Effects model is a statistical model that accounts for fixed effects, common trends that are present at all levels of the data, and random effects, group-specific error terms that quantify correlation within groups and variation between groups. The inclusion of random effects makes GLME especially adept at handling hierarchical and longitudinal data, where observations are grouped into different levels. Besides the additional random effects, GLME models have the same distributional and error assumptions as GLM.
 
 In addition, GLME models can accommodate non-normal responses using different link functions to control the relationship between the response mean and the other variables. In these models, we control the variance of the response by assuming the response follows a specific distribution. For this study, we use the log link function and Poisson or Negative Binomial regression family due to the response being count data.
 
@@ -205,7 +203,9 @@ In addition, GLME models can accommodate non-normal responses using different li
 
 For the first question regarding the effects of each intervention, we recommend the following GLM model $$\log(\text{Sales}) = \beta_0+\beta_1\times\text{Intervention} + \log(\text{Total Sales})$$ with the control period being the reference and the total sales as the offset. Both the pre-intervention and follow-up periods are considered as the control period in this case. For the second question regarding the difference in intervention effects between sites, we recommend the same model as the first question with the addition of the interaction term between intervention and site. For the third question comparing individual interventions against their combination, we recommend the following GLM model $$\log(\text{Sales}) = \beta_0+\beta_1\times\text{Calorie} +\beta_2\times\text{Exercise} + \log(\text{Total Sales})$$ with the combination period being the reference. If the interest is also the effect of combining discount and messaging, then the following model is recommended $$\log(\text{Sales}) = \beta_0+\beta_1\times\text{Discount} + \log(\text{Total Sales})$$ with the discount plus messaging as the reference. For the final question comparing the effects of calorie messaging and simple calorie admonishment, we recommend the following GLM model $$\log(\text{Sales}) = \beta_0+\beta_1\times\text{Calorie} + \log(\text{Total Sales})$$ with the calorie admonishment period being the reference.
 
-In the model for the second question, we recommend first running a preliminary GLM for each of the interventions and the pre-intervention period. If there are significant differences in estimated coefficients between interventions, a GLME model with intervention-dependent random effects is recommended. A similar strategy is recommended for the other questions where the preliminary GLM is performed for each site and site-dependent random effects are added when differences in estimated coefficients between sites are significant. The reason for these preliminary analyses is to determine if GLME is necessary or not. After the models are fitted, the residuals need to be visualized via scatter plot, autocorrelation plot and QQ-plot to confirm independent, equal variance and normal error assumptions for both GLM and GLME. For hypothesis testing and interpretation, Bonferroni correction is applied to the significance level (i.e. divide the significance level by the number of hypothese) to counter false rejection. For model diagnostics, we recommend using QQ-plots to confirm the distributional assumption and scatter plot of the residuals for the independent error assumption.
+In the model for the second question, we recommend first running a preliminary GLM for each of the interventions and the pre-intervention period. If there are significant differences in estimated coefficients between interventions, a GLME model with intervention-dependent random effects is recommended. A similar strategy is recommended for the other questions where the preliminary GLM is performed for each site and site-dependent random effects are added when differences in estimated coefficients between sites are significant. The reason for these preliminary analyses is to determine if GLME is necessary or not.
+
+After the models are fitted, the residuals need to be visualized via scatter plot, autocorrelation plot and QQ-plot to confirm independent, equal variance and normal error assumptions for both GLM and GLME. For hypothesis testing and interpretation, the Bonferroni correction should be applied to the significance level. This means dividing the significance level by the number of hypotheses being tested to counter false rejections. For model diagnostics, we recommend using QQ-plots to confirm the distributional assumption and scatter plot of the residuals for the independent error assumption.
 
 # Conclusion
 
@@ -218,13 +218,12 @@ Poisson and Negative Binomial GLME models are suggested to analyze the effective
 # Appendix
 
 ::: {#appendix-count}
-
 ```{=tex}
 \renewcommand\thefigure{A.\arabic{figure}}
 \setcounter{figure}{0}
 ```
 ## Preliminary GLM
-  
+
 In the preliminary analysis examining the efficacy of interventions designed to encourage the consumption of zero-calorie beverages, we are particularly interested in understanding how these interventions perform across different hospital sites. To make informed decisions about our model structure, specifically whether to include random slopes or random intercepts, we generate plots that visualize the effects of interventions across the sites.
 
 With only three sites in our study, incorporating random effects is not advisable due to the limited data available. A small number of groups can lead to overfitting and unreliable estimates of variability. Therefore, despite variations in the preliminary analysis, we will not include random effects for sites, keeping our model straightforward against the challenges of a small sample size.
@@ -232,31 +231,130 @@ With only three sites in our study, incorporating random effects is not advisabl
 Now we proceed to determine if intervention-specific random effect is needed. By using `ggcoef_compare`, we are able to produce plots that display the confidence intervals for the incidence rate ratios (IRR) of each intervention, broken down by site. These plots are a powerful diagnostic tool—they help us to visually inspect if there is a notable variation in the effects of interventions within the different hospital sites. With the plot containing both intercept and slope, we will be able to determine whether we need random intercept or slope based on the variability.
 
 ```{r}
+#| label: fig-randint
+#| fig-cap: "**CIs for consumption of Zero Calorie Beverages**"
 #| echo: false
-#| eval: true 
 #| warning: false
-#| file: ../code/03_GLMM_randint.R
+#| fig-width: 7
+#| fig-height: 4.5
+#| out-width: 180mm
+#| out-height: 110mm
+
+source(here("code", "03_GLMM_randint.R"))
+
+adjusted_cl <- round(1-0.05/46,6)
+adjusted_sl <- round(0.05/46,6)
+
+ggcoef_compare(modelsnb,
+               intercept = T,
+               conf.level = adjusted_cl,
+               significance = adjusted_sl) +
+  scale_color_jmr(palette = "generaletend",
+                  guide = guide_legend(
+                    nrow = 2,
+                    direction = "horizontal",
+                    title.position = "top")) +
+  theme(text = element_text(family = "Times New Roman"))
+
 ```
 
 From the plot provided relating to consumption of zero-calorie beverages, we see that The confidence intervals within each site demonstrate variation in the effect sizes of the interventions. This pattern suggests substantial heterogeneity in the treatment effects within sites, indicating that the inclusion of random slopes for the interventions would be appropriate to model this within-site variation. Conversely, the relatively consistent placement of the confidence interval centers across the different sites argues against the need for random intercepts, as it implies little variation in the baseline effects between sites. Thus, a mixed-effects model with random slopes for interventions would be a good choice. A comparable plot can be produced to examine the consumption of sugary beverages, which similarly indicates the necessity of incorporating random slopes into the model to account for the variability in effects.
 
-
 ## Formal analysis
-For the first question regarding the effects of each intervention, there is a significant increase in zero-calorie beverage sales when discount plus messaging is implemented and no similar increase in sugary beverage sales. Other interventions have no significant effect. This suggests discount plus messaging is effective at encouraging people to buy zero-calorie beverages.
 
-For the second question regarding the difference in intervention effects between sites, the results are summarized in Table //insert table of results for question 2//. It is interesting to note that discount plus messaging has significantly different effect across sites for both zero-calorie and sugary beverages.
+### Bonferroni correction
 
-//insert table of results for question 2//
+When using the Bonferroni correction, the significance level is adjusted by dividing 0.05 by the number of hypotheses being tested, in this case, 46. The confidence level for the confidence intervals is $1-0.05/46$.
+
+### Link function
+
+Poisson GLME models exhibit overdispersion for this data (mean being less than variance). Therefore, the results above are obtained using negative binomial GLME, which eliminates overdispersion. In addition, negative binomial models have better QQ plots, which is illustrated in @fig-pois and @fig-nb.
+
+```{r}
+#| label: fig-pois
+#| fig-cap: "**QQ and residual scatter plots for poisson GLME model of first question**"
+#| echo: false
+#| warning: false
+#| fig-width: 8
+#| fig-height: 4.5
+#| out-width: 180mm
+#| out-height: 80mm
+
+plot(simulateResiduals(glmm_zerocalposs))
+```
+
+```{r}
+#| label: fig-nb
+#| fig-cap: "**QQ and residual scatter plots for negative binomial GLME model of first question**"
+#| echo: false
+#| warning: false
+#| fig-width: 8
+#| fig-height: 4.5
+#| out-width: 180mm
+#| out-height: 80mm
+
+plot(simulateResiduals(glmm_zerocalnb))
+
+```
+
+### Results
+
+For the first question regarding the effects of each intervention, there is a significant increase in zero-calorie beverage sales when discount plus messaging is implemented and no similar increase in sugary beverage sales as can be observed on @fig-q1. Other interventions have no significant effect. This suggests that discount plus messaging is effective at encouraging people to buy zero-calorie beverages.
+
+```{r}
+#| label: fig-q1
+#| fig-cap: "**CIs for consumption of Zero-Calorie and Sugary Beverages by Intervention**"
+#| echo: false
+#| warning: false
+#| fig-width: 7
+#| fig-height: 4
+#| out-width: 180mm
+#| out-height: 80mm
+
+models <- list(
+  "Zero-Calorie\nBeverage" = glmm_zerocalnb,
+  "Sugary\nBeverage" = glmm_sugary
+)
+
+ggcoef_compare(models,
+               intercept = T,
+               include = c("Intervention"),
+               conf.level = adjusted_cl,
+               significance = adjusted_sl) +
+  theme(text = element_text(family = "Times New Roman"))
+
+```
+
+For the second question regarding the difference in intervention effects between sites, the results are summarized in Table @fig-q2. It is interesting to note that discount plus messaging has different effect across sites for both zero-calorie and sugary beverages.
+
+```{r}
+#| label: fig-q2
+#| fig-cap: "**CIs for consumption of Zero-Calorie and Sugary Beverages by Intervention and Site**"
+#| echo: false
+#| warning: false
+#| fig-width: 7
+#| fig-height: 4
+#| out-width: 180mm
+#| out-height: 80mm
+
+models2 <- list(
+  "Zero-Calorie\nBeverage" = glmm_zerocal_chop,
+  "Sugary\nBeverage" = glmm_sugary_chop
+)
+
+ggcoef_compare(models2,
+               intercept = T,
+               include = c("Site",
+                 "Intervention:Site"),
+               conf.level = adjusted_cl,
+               significance = adjusted_sl,
+               facet_labeller = label_wrap_gen(50)) +
+  ggplot2::scale_y_discrete(labels = scales::label_wrap(230)) +
+  theme(text = element_text(family = "Times New Roman"))
+
+```
 
 For the third question comparing individual interventions against their combination, using both calorie messaging and calorie admonishment is not significantly different from implementing them individually. But discount plus messaging does improve sales for zero-calorie beverages compare to discount only.
 
 For the final question comparing the effects of calorie messaging and simple calorie admonishment, there are no significant results for both zero-calorie and sugary beverages.
-
-In addition, poisson GLME models exhibit overdispersion for this data (mean being less than variance). Therefore, the results above are obtained using negative binomial GLME, which eliminates overdispersion. In addition, negative binomial models have better QQ plots, which is illustrated in @fig-pois and @fig-nb.
-
-
-![**QQ and residual scatter plots for poisson GLME model of first question**](../figs/QQ_pois.png){#fig-pois}
-![**QQ and residual scatter plots for negative binomial GLME model of first question**](../figs/QQ_nb.png){#fig-nb}
 :::
-
-

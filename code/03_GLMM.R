@@ -6,17 +6,18 @@ library(ggstats)
 library(performance)
 library(glmmTMB)
 library(here)
+library(broom.mixed)
+
 
 # Read data
-df <- read.csv(here("rawdata", "june1data.csv"))
-
-## Remove the washout periods and set followup as preint
-
-df = mutate(df,
-            Intervention = recode(Intervention,
+df <- read.csv(here("rawdata", "june1data.csv")) %>% 
+  mutate(Intervention = recode(Intervention,
                                   "follow" = "preint"), # set all control periods to preint
-            Total2 = ZeroCal + Sugary)%>%               # add sum of zerocal and sugary for future use
-  filter(!(Intervention %in% c("wash", "wash2")))       # remove wash periods
+            Total2 = ZeroCal + Sugary)               # add sum of zerocal and sugary for future use
+  # filter(!(Intervention %in% c("wash", "wash2"))) %>%      # remove wash periods
+  # filter(!(Site == "NS" &
+  #          (Count < 40))) %>%
+  # mutate(Total = ifelse(Count == 199, NA, Total))
 
 # set preint as baseline
 df$Intervention = relevel(as.factor(df$Intervention),ref = "preint") 
@@ -141,8 +142,15 @@ df$Site = relevel(as.factor(df$Site),ref = "chop")
 glmm_zerocal_chop=glmmTMB(ZeroCal~Intervention*Site + (0+Site|Intervention) + offset(log(Total)), data = df, family=nbinom2)
 summary(glmm_zerocal_chop)
 
+
+ggcoef_model(glmm_zerocal_chop, #intercept = T,
+             include = c("Intervention", "Site",
+                         "Intervention:Site"))
+
 check_overdispersion(glmm_zerocal_chop)
 plot(simulateResiduals(glmm_zerocal_chop))
+
+broom.mixed::tidy(glmm_zerocal_chop) 
 # => overdispersion not detected + lest terrible KS test
 
 # sugary
@@ -191,7 +199,7 @@ glmm_zerocal_both=glmmTMB(ZeroCal~Intervention + (0+Site|Intervention) + offset(
 summary(glmm_zerocal_both)
 
 check_overdispersion(glmm_zerocal_both)
-plot(simulateResiduals(glmm_zerocal_both))
+plot(simulateResiduals(glmm_zerocal_both)) #fig-nb maybe
 
 
 ## Q4
