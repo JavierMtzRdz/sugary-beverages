@@ -110,9 +110,7 @@ sug_bev_long <- sug_bev %>%
 
 # Introduction
 
-Zero-calorie beverages have been promoted as an alternative to sugary drinks to reduce the harmful effects of artificial sweeteners on consumers. The advised study investigates the impact of interventions, such as messaging and discounts, on the buying behaviour of zero-calorie and sugary drinks.The statistical advice for that study outlines how to quantitatively evaluate four research questions on this topic. The statistical questions to be answered include the following: 1) whether the interventions lead to increased consumption of zero-calorie beverages and decreased consumption of sugary beverages; 2) whether the effects vary across different sites; and 3) which of the combining interventions results in larger effects. <!--
-Javier: I removed the fourth question since it can be addressed in the first question.
--->
+Zero-calorie beverages have been promoted as an alternative to sugary drinks to reduce the harmful effects of artificial sweeteners on consumers. The advised study investigates the impact of interventions, such as messaging and discounts, on the buying behaviour of zero-calorie and sugary drinks.The statistical advice for that study outlines how to quantitatively evaluate four research questions on this topic. The statistical questions to be answered include the following: 1) whether the interventions lead to increased consumption of zero-calorie beverages and decreased consumption of sugary beverages; 2) whether the effects vary across different sites 3) whether combining interventions will have a larger effect; and 4) whether calorie or exercise messaging results in larger effects.
 
 # Data Description and Summaries
 
@@ -215,9 +213,9 @@ with the control period being the reference and the total sales as the offset. B
 $$\log(\text{Sales}) = \beta_0+\beta_1\times\text{Calorie} +\beta_2\times\text{Exercise} + \log(\text{Total Sales})$$
 with the combination period being the reference. If the interest is also the effect of combining discount and messaging, then the following model is recommended 
 $$\log(\text{Sales}) = \beta_0+\beta_1\times\text{Discount} + \log(\text{Total Sales})$$ 
-with the discount plus messaging as the reference. For the final question comparing the effects of calorie messaging and simple calorie admonishment, we recommend the following GLM model 
-$$\log(\text{Sales}) = \beta_0+\beta_1\times\text{Calorie} + \log(\text{Total Sales})$$
-with the calorie admonishment period being the reference. 
+with the discount plus messaging as the reference. For the final question comparing the effects of calorie and exercise messaging, we recommend the following GLM model 
+$$\log(\text{Sales}) = \beta_0+\beta_1\times\text{Exercise} + \log(\text{Total Sales})$$
+with the calorie messaging period being the reference. 
 
 In the model for the second question, we recommend first running a preliminary GLM for each of the interventions and the pre-intervention period. If there are significant differences in estimated coefficients between interventions, a GLME model with intervention-dependent random effects is recommended. A similar strategy is recommended for the other questions where the preliminary GLM is performed for each site and site-dependent random effects are added when differences in estimated coefficients between sites are significant. The reason for these preliminary analyses is to determine if GLME is necessary or not. After the models are fitted, the residuals need to be visualized via scatter plot, autocorrelation plot and QQ-plot to confirm independent, equal variance and normal error assumptions for both GLM and GLME. For hypothesis testing and interpretation, Bonferroni correction is applied to the significance level (i.e. divide the significance level by the number of hypothese) to counter false rejection. For model diagnostics, we recommend using QQ-plots to confirm the distributional assumption and scatter plot of the residuals for the independent error assumption.
 
