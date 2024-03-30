@@ -95,8 +95,8 @@ sug_bev_long <- sug_bev %>%
          intervention = recode(intervention,
                                "wash" = "Washout",
                                "wash2" = "Washout",
-                               "preint" = "Pre-intervention",
-                               "follow" = "Follow", 
+                               "preint" = "Pre/pos-intervention",
+                               "follow" = "Pre/pos-intervention",
                                "dis" = "Discount",
                                "dismes" = "Discount +\nmessaging",
                                "cal" = "Caloric content \nmessaging",
@@ -223,16 +223,12 @@ In the model for the second question, we recommend first running a preliminary G
 
 Poisson and Negative Binomial GLME models are suggested to analyze the effectiveness of interventions on beverage sales across hospitals, addressing four research questions. Preliminary GLM models are used to identify differences between intervention and site effects. GLME models are recommended for formal analysis when significant variations are observed, and GLM models are suggested otherwise. This approach ensures a thorough investigation into how each intervention influences beverage choices, the impact of site characteristics and the effectiveness of calorie information and exercise prompts. The methodology recommended would provide a clear path to understanding which interventions work best in promoting healthier beverage consumption.
 
-\newpage
-
-# References
-
-::: {#refs}
-:::
 
 \newpage
 
-# Appendices
+\appendix
+
+# Appendix
 
 ::: {#appendix-count}
 ## Detailed Explorarory Analysis {#sec-appeda}
@@ -241,10 +237,7 @@ Poisson and Negative Binomial GLME models are suggested to analyze the effective
 \renewcommand\thefigure{A.\arabic{figure}}
 \setcounter{figure}{0}
 ```
-![**ACF and PACF by Beverage and Site**](../figs/eda-4_acf-pacf.png){#fig-2}
 
-![**Decomposition Analysis of Sales for Sugary and Zero-Calorie Beverages**](../figs/eda-3_decomposition.png){#fig-3}
-:::
 
 ## Preliminary GLM
 In the preliminary analysis examining the efficacy of interventions designed to encourage the consumption of zero-calorie beverages, we are particularly interested in understanding how these interventions perform across different hospital sites. To make informed decisions about our model structure, specifically whether to include random slopes or random intercepts, we generate plots that visualize the effects of interventions across the sites.
@@ -276,5 +269,8 @@ For the final question comparing the effects of calorie messaging and simple cal
 
 In addition, poisson GLME models exhibit overdispersion for this data (mean being less than variance). Therefore, the results above are obtained using negative binomial GLME, which eliminates overdispersion. In addition, negative binomial models have better QQ plots, which is illustrated in @fig-pois and @fig-nb.
 
+
 ![**QQ and residual scatter plots for poisson GLME model of first question**](../figs/QQ_pois.png){#fig-pois}
 ![**QQ and residual scatter plots for negative binomial GLME model of first question**](../figs/QQ_nb.png){#fig-nb}
+:::
+
