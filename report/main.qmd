@@ -269,13 +269,24 @@ the response being count data.
 
 ## Recommendations
 
-For the first question regarding the effects of each intervention, we recommend the
-following GLM model
+For the first question regarding the effects of each intervention, we recommend
+the following GLM model
 $$\log(\text{Sales}) = \beta_0+\beta_1\times\text{Intervention} + \log(\text{Total Sales})$$
-with the control period being the reference and the total sales as the offset. Both the pre-intervention and follow-up periods are considered as the control period in this case. For the second question regarding the difference in intervention effects between sites, we recommend the same model as the first question with the addition of the interaction term between intervention and site. For the third question comparing individual interventions against their combination, we recommend the following GLM model 
+with the control period being the reference and the total sales as the offset.
+Both the pre-intervention and follow-up periods are considered as the control
+period in this case. For the second question regarding the difference in
+intervention effects between sites, we recommend the same model as the first
+question with the addition of the interaction term between intervention and
+site. For the third question comparing individual interventions against their
+combination, we recommend the following GLM model
 $$\log(\text{Sales}) = \beta_0+\beta_1\times\text{Calorie} +\beta_2\times\text{Exercise} + \log(\text{Total Sales})$$
-with the combination period being the reference. If the interest is also the effect of combining discount and messaging, then the following model is recommended 
-$$\log(\text{Sales}) = \beta_0+\beta_1\times\text{Discount} + \log(\text{Total Sales})$$ with the discount plus messaging as the reference. For the final question comparing the effects of calorie messaging and exercise messaging, we recommend the following GLM model 
+with the combination period being the reference. If the interest is also the
+effect of combining discount and messaging, then the following model is
+recommended
+$$\log(\text{Sales}) = \beta_0+\beta_1\times\text{Discount} + \log(\text{Total Sales})$$ 
+with the discount plus messaging as the reference. For the final question
+comparing the effects of calorie messaging and exercise messaging, we recommend
+the following GLM model
 $$\log(\text{Sales}) = \beta_0+\beta_1\times\text{Exercise} + \log(\text{Total Sales})$$
 with the calorie messaging period being the reference.
 
