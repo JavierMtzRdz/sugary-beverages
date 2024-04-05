@@ -32,6 +32,12 @@ Sys.setlocale("LC_ALL", "es_ES.UTF-8")
 ## Disable scientific notation ----
 options(scipen = 999)
 
+## Set theme ------
+theme_set(theme_jmr(text = element_text(family = "Times New Roman")))
+
+options(ggplot2.discrete.colour = paletas_jmr$general,
+        ggplot2.discrete.fill = paletas_jmr$general)
+
 # Load data ----
 sug_bev <- read_csv("rawdata/june1data.csv") %>% 
   clean_names() %>% 
@@ -44,9 +50,9 @@ sug_bev <- read_csv("rawdata/june1data.csv") %>%
          date = as_date(count, # It does not match the dates very well.
                         origin = "00-10-25 UTC"),
          site = recode(site,
-                       "chop" = "A",
-                       "HF" = "B",
-                       "NS" = "C")) %>% 
+                       "chop" = "Site A",
+                       "HF" = "Site B",
+                       "NS" = "Site C")) %>% 
   arrange(site, count)
 
 glimpse(sug_bev)
@@ -101,7 +107,8 @@ sug_bev_long %>%
              ncol = 1) +
   geom_line() +
   scale_x_continuous(expand = expansion(mult = c(0.0, 0.0))) +
-  scale_color_jmr(guide = guide_legend(
+  scale_color_jmr(palette = "general",
+                  guide = guide_legend(
     nrow = 2,
     direction = "horizontal",
     title.position = "top")) +
@@ -167,6 +174,34 @@ ggsave("figs/eda-1.1_time-serie-percent.png",
        height = 120,
        units = "mm",
        dpi = 300)
+
+## Sellings by site and category as % site 3-----
+
+sug_bev_long %>% 
+  filter(site == "Site C") %>%
+  ggplot(aes(x = count, 
+             y = values_percent, 
+             group = beverage,
+             color = beverage)) +
+  geom_line() +
+  scale_x_continuous(expand = expansion(mult = c(0.0, 0.0))) +
+  scale_color_jmr(guide = guide_legend(
+    nrow = 2,
+    direction = "horizontal",
+    title.position = "top")) +
+  scale_fill_jmr(palette = "multiple",
+                 guide = guide_legend(
+                   direction = "horizontal",
+                   title.position = "top")) +
+  labs(colour = "Beverage",
+       fill = "Intervention periods",
+       x = "Days since the start of the study",
+       y = "Sold beverages",
+       caption = "Source: client submission. ") +
+  theme_jmr(legend.spacing = unit(0.5, "cm"),
+            legend.key.height = unit(0.7, "cm"),
+            text = element_text(family = "Times New Roman"))
+
 
 # Seasonal plot -----
 sug_bev_long %>% 
